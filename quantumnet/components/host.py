@@ -99,17 +99,6 @@ class Host():
         self.memory.append(qubit)
         Logger.get_instance().debug(f'Qubit {qubit.qubit_id} adicionado à memória do Host {self.host_id}.')
 
-
-
-    def set_routing_table(self, routing_table: dict):
-        """
-        Define a tabela de roteamento do host.
-        Args:
-            routing_table (dict): Tabela de roteamento.
-        """
-
-        self._routing_table = routing_table
-
     def info(self):
         """
         Retorna informações sobre o host.
@@ -123,9 +112,22 @@ class Host():
             'routing_table': "No registration" if self.routing_table == None else self.routing_table
         }
 
-    def announce_to_controller_app_has_finished(self):
+    def add_match_fields():
+        pass
+    
+    def add_action():
+        pass
+    
+    def add_match_action():
         """
-        Informa ao controlador que a aplicação terminou.
+        Adiciona uma ação e um match na tabela de fluxo.
         """
-
-        print(f'Host {self.host_id} informou ao controlador que a aplicação terminou.')
+        pass
+    
+    def requests_match_action():
+        """
+        Requisita uma ação e um match na tabela de fluxo ao controlador.
+        """
+        pass
+    
+    

@@ -66,4 +66,3 @@ class Controller():
         """
 
         print(f"Alice {route[0]} e Bob {route[-1]} informados.")
-
