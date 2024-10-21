@@ -114,7 +114,7 @@ class Host():
     
     def requests_match_action(self, match):
         """
-        Requisita uma ação e um match na tabela de fluxo ao controlador.
+        Requisita uma ação de um match na tabela de fluxo ao controlador.
         """
         
         pass
