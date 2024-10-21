@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
 
-class Roule(ABC):
+class Decision(ABC):
     def __init__(self, name: str, description: str):
         self.name = name
         self.description = description
 
     def __str__(self):
-        return f"Roule: {self.name} - {self.description}"
+        return f"Decision: {self.name} - {self.description}"
     
     @abstractmethod
     def verify(self, info: list):
