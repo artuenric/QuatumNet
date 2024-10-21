@@ -16,7 +16,7 @@ class Host():
         self._routing_table[host_id] = [host_id]
         # Sobre a execução
         self.logger = Logger.get_instance()
-        self._routing_table = None
+    
     def __str__(self):
         return f'{self.host_id}'
     
@@ -111,23 +111,18 @@ class Host():
             'memory': len(self.memory),
             'routing_table': "No registration" if self.routing_table == None else self.routing_table
         }
-
-    def add_match_fields():
-        pass
     
-    def add_action():
-        pass
-    
-    def add_match_action():
-        """
-        Adiciona uma ação e um match na tabela de fluxo.
-        """
-        pass
-    
-    def requests_match_action():
+    def requests_match_action(self, match):
         """
         Requisita uma ação e um match na tabela de fluxo ao controlador.
         """
+        
         pass
     
-    
+    def check_match_action(self, match):
+        """
+        Verifica se há uma ação para um match na tabela de fluxo.
+        """
+        if match in self.routing_table:
+            return True
+        return False
