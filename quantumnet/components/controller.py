@@ -49,7 +49,7 @@ class Controller():
         return action
     
     def set_actions(self, request, host):
-        action = self.apply_decision(request)
+        actions = self.apply_decision(request)
         
         pass
     
