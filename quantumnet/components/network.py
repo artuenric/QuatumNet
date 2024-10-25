@@ -422,4 +422,3 @@ class Network():
                     current_fidelity = epr.get_current_fidelity()
                     new_fidelity = current_fidelity * decoherence_factor
                     epr.set_fidelity(new_fidelity)
-

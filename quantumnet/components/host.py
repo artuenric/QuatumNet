@@ -12,8 +12,7 @@ class Host():
         self._max_qubits_create = max_qubits_create
         self._probability_on_demand_qubit_create = probability_on_demand_qubit_create
         self._probability_replay_qubit_create = probability_replay_qubit_create
-        self._routing_table = {}
-        self._routing_table[host_id] = [host_id]
+        self._flow_table = self.start_flow_table()
         # Sobre a execução
         self.logger = Logger.get_instance()
     
@@ -58,7 +57,6 @@ class Host():
             dict : Tabela de roteamento.
         """
         return self._routing_table
-    
     
     def get_last_qubit(self):
         """
@@ -112,17 +110,59 @@ class Host():
             'routing_table': "No registration" if self.routing_table == None else self.routing_table
         }
     
-    def requests_match_action(self, match):
+    def start_flow_table(self):
+        """
+        Inicia a tabela de fluxo do host.
+        """
+        flow_table = {
+            #[match]: ([actions], [route])
+            (self.host_id, 1, 0) : ("Descartar. Origem igual ao destino."),
+        }
+        
+        return flow_table
+    
+    def requests_match_action(self, request):
         """
         Requisita uma ação de um match na tabela de fluxo ao controlador.
         """
-        
-        pass
+        if self.find_match_request(request):
+            return None
+        return request
     
-    def check_match_action(self, match):
+    def find_roule_by_request(self, request):
         """
-        Verifica se há uma ação para um match na tabela de fluxo.
+        Verifica se há ações para um match na tabela de fluxo, dado uma request.
+        
+        Args:
+            request (list): Lista com as informações da request.
+        
+        Returns:
+            list : Caso haja match, retorna a regra (lista de ações que devem ser executadas). Caso contrário, retorna False.
+            
         """
-        if match in self.routing_table:
-            return True
+        print("Estou procurando um match para a request", request)
+        # Percorre a tabela de fluxo.
+        for match in self._flow_table:
+            # Se o segundo item da request (o destino) for igual ao primeiro item do match (o destino).
+            if request[1] == match[0]:
+                # Se o terceiro item da request (a Fmin) for menor ou igual ao segundo item do match (a Fmin).
+                if request[2] >= match[1]:
+                    # Se o quarto item da request (o número de pares EPR) for maior ou igual ao terceiro item do match (o número de pares EPR).
+                    if request[3] >= match[2]:
+                        return self._flow_table[match]
         return False
+    
+    def add_match_route_actions(self, request, route, actions):
+        """
+        Adiciona um match, rota e ação à tabela de fluxo.
+        """
+        match = request[1:]
+        self.routing_table[match] = (actions, route)
+        
+        
+    
+## Match fica na tabela de fluxo, são as chaves do dicionário.
+## Request é o que chega, comparado ao match, são diferentes apenas pelo primeiro item. Que no request é o host_id do host que está enviando a requisição.
+## Route é a rota que o pacote deve seguir.
+# Actions são as ações que devem ser executadas. Especificamente classes. O controlador executará essas ações por meio da rede.
+# Roules são conjuntos de ações.

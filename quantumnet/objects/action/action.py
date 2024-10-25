@@ -3,6 +3,7 @@ class Action():
         self.action_name = action_name
         self.action_description = action_description
         self.nodes = [] # origem e destino
+        self.time_slot = None
     
     def set_nodes(self, nodes):
         if len(nodes) != 2:
