@@ -50,13 +50,13 @@ class Host():
         return self._memory
     
     @property
-    def routing_table(self):
+    def flow_table(self):
         """
         Tabela de roteamento do host.
         Returns:
             dict : Tabela de roteamento.
         """
-        return self._routing_table
+        return self._flow_table
     
     def get_last_qubit(self):
         """
@@ -114,9 +114,12 @@ class Host():
         """
         Inicia a tabela de fluxo do host.
         """
+        #[match]: (roule)
+        # o mesmo que
+        #[match]: ([actions], [route])
+        
         flow_table = {
-            #[match]: ([actions], [route])
-            (self.host_id, 1, 0) : ("Descartar. Origem igual ao destino."),
+            #(self.host_id, 0, 0) : ("Descartar. Origem igual ao destino."),
         }
         
         return flow_table
@@ -146,9 +149,9 @@ class Host():
             # Se o segundo item da request (o destino) for igual ao primeiro item do match (o destino).
             if request[1] == match[0]:
                 # Se o terceiro item da request (a Fmin) for menor ou igual ao segundo item do match (a Fmin).
-                if request[2] >= match[1]:
+                if request[2] <= match[1]:
                     # Se o quarto item da request (o número de pares EPR) for maior ou igual ao terceiro item do match (o número de pares EPR).
-                    if request[3] >= match[2]:
+                    if request[3] <= match[2]:
                         return self._flow_table[match]
         return False
     
@@ -156,8 +159,7 @@ class Host():
         """
         Adiciona um match, rota e ação à tabela de fluxo.
         """
-        match = request[1:]
-        self.routing_table[match] = (actions, route)
+        self._flow_table[(request[1], request[2], request[3])] = (actions, route)
         
         
     

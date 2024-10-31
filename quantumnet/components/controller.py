@@ -1,7 +1,7 @@
 import networkx as nx
 from ..components import Network, Host
-from ..objects.decision import Decision_X
-from ..objects.action import CreateEPRAction, SwapAction, PurificationAction
+from ..objects.decision import *
+from ..objects.action import *
 
 class Controller():
     def __init__(self, network):
@@ -27,7 +27,9 @@ class Controller():
         Define as decisões do controlador para escolher as ações.
         """
         decision = {
-            (Decision_X(),): [CreateEPRAction, SwapAction, PurificationAction], # que coisa horrivel
+            (SourceIsTarget(),): [DropRequestAction],            
+            (HighFidelity(),): [PurificationAction],
+            
         }
         return decision
     
@@ -39,20 +41,20 @@ class Controller():
             info (lista): Lista com as informações da request.
         
         Returns:
-            action (lista): Lista com as ações que devem ser executadas.
+            actions (lista): Lista com as ações que devem ser executadas.
         """
         
         print("Aplicando decisão do controlador para a request", request)
-        action = None
+        actions = None
         for decision in self.decisions:
             print("Decisões:", [d.description for d in decision])
             # Retorna a ação correspondente as decisões da tabela que são válidas para a request.
             if all(d.verify(request) for d in decision):
                 print("Decisão aplicada:", decision.__str__())
-                action = self.decisions[decision]
+                actions = self.decisions[decision]
                 break
-        print("Ações que devem ser executadas:", action)
-        return action
+        print("Ações que devem ser executadas:", actions)
+        return actions
         
     def add_match_route_actions_in_host(self, request, host):
         """
@@ -65,8 +67,48 @@ class Controller():
         # Obtém as ações que devem ser executadas de acordo com as decisões do controlador.
         actions = self.apply_decision(request)
         # Calcula a rota para o destino (segundo item da lista) da request.
-        route = self.calculate_route(request[1])
+        route = self.calculate_route(request[0], request[1])
+        # Qualifica as ações de acordo com as informações da request.
+        actions = self.qualify_action(request, actions, route)
+        print("Ações qualificadas:", actions)
         # Adiciona a rota e as ações ao host.
-        host.add_match_actions(request=request, route=route, actions=actions)
-    
-    #TODO: Implementar método que adiciona as informações necessárias para as ações. Por exemplo os hosts entre a criação do EPR e o tempo do time_slot.
+        host.add_match_route_actions(request=request, route=route, actions=actions)
+
+    # Provavelmente o ideal seria um método para cada tipo de ação, mas por enquanto vamos manter assim.
+    def qualify_action(self, request, actions, route):
+        """
+        Qualifica uma ação de acordo com as informações da request.
+
+        Args:
+            request (list): Lista com as informações da request.
+            actions (list): Lista com as ações que devem ser executadas.
+            route (list): Lista com a rota para o destino.
+        """
+        # TODO: Aqui também vai ser considerado o time-slot etc. Essa é uma função ABSURDAMENTE importante uma das mais complexas.
+        # TODO: Cada regra deve conter várias ações, provavelmente repetidas, mas com informações diferentes. Por isso, essa parte do código deve ser alterada futuramente. Focando em abstrair o processo.
+        
+        new_actions = []
+        print("Qualificando ações para a request", request)
+        for action in actions:
+            new_action = action()
+            print("Ação:", new_action)
+            if action == CreateEPRAction:
+                print("Ação CreateEPRAction")
+                new_action.set_nodes((request[0], request[1]))
+                new_actions.append(new_action)
+            elif action == SwapAction:
+                print("Ação SwapAction")
+                new_action.set_nodes((request[0], request[1]))
+                new_actions.append(new_action)
+            elif action == PurificationAction:
+                print("Ação PurificationAction")
+                new_action.set_nodes((request[0], request[1]))
+                new_actions.append(new_action)
+            elif action == DropRequestAction:
+                print("Ação DropRequestAction")
+                new_action.set_nodes((request[0], request[1]))
+                new_actions.append(new_action)
+            
+            # TODO: Considerar a possibilidade da ação ser None, ou dar um outro valor pra ela em apply_decision.
+        
+        return new_actions
