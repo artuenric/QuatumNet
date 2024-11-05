@@ -116,21 +116,20 @@ class Host():
         """
         #[match]: (roule)
         # o mesmo que
-        #[match]: ([actions], [route])
+        #[match]: ([roule], [route])
         
-        flow_table = {
-            #(self.host_id, 0, 0) : ("Descartar. Origem igual ao destino."),
+        return {
         }
-        
-        return flow_table
     
-    def requests_match_action(self, request):
+    def requests_match_roule(self, request):
         """
         Requisita uma ação de um match na tabela de fluxo ao controlador.
+        
+        Returns:
+            list : Retorna a ação que deve ser executada.
         """
-        if self.find_match_request(request):
-            return None
-        return request
+        #TODO: Implementar a busca por match na tabela de fluxo.
+        pass
     
     def find_roule_by_request(self, request):
         """
@@ -143,7 +142,6 @@ class Host():
             list : Caso haja match, retorna a regra (lista de ações que devem ser executadas). Caso contrário, retorna False.
             
         """
-        print("Estou procurando um match para a request", request)
         # Percorre a tabela de fluxo.
         for match in self._flow_table:
             # Se o segundo item da request (o destino) for igual ao primeiro item do match (o destino).
@@ -155,11 +153,11 @@ class Host():
                         return self._flow_table[match]
         return False
     
-    def add_match_route_actions(self, request, route, actions):
+    def add_match_route_roule(self, request, route, roule):
         """
         Adiciona um match, rota e ação à tabela de fluxo.
         """
-        self._flow_table[(request[1], request[2], request[3])] = (actions, route)
+        self._flow_table[(request[1], request[2], request[3])] = (route, roule)
         
         
     

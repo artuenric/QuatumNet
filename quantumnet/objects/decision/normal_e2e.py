@@ -7,7 +7,10 @@ class NormalE2E(Decision):
         """
         Verifica se a request é uma request normal.
         """
-        if all(type(r) == int for r in request):
-            if all(r > 0 for r in request[:2]):
+        print("Verificando se a request é uma request normal E2E.")
+        if all(type(r) == int or type(r) == float for r in request):
+            print("Request é uma request normal E2E.")
+            if all(r > 0 for r in request[2:]):
+                print("Request é com certeza uma request normal E2E.")
                 return True
         return False
