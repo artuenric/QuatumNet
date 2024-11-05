@@ -90,54 +90,21 @@ class Controller():
         for action in actions:
             if action == CreateEPRAction:
                 paths = [(route[i], route[i+1]) for i in range(len(route) - 1)]
-                roule[1] = [CreateEPRAction(path) for path in paths]
+                roule[1] = [CreateEPRAction(path, self) for path in paths]
             elif action == SwapAction:
                 pairs = [(route[i], route[i+1]) for i in range(len(route) - 1)]
-                roule[2] = [SwapAction(pairs[i], pairs[i+1]) for i in range(len(pairs) - 1)]
+                roule[2] = [SwapAction(pairs[i], pairs[i+1], self) for i in range(len(pairs) - 1)]
                 
-        """
-        minhas ideias pra essa bomba (até agora todas foram ruins)
-        if SourceIsTarget in actions:
-            roule.append(DropRequestAction())
-            return roule
-        
-        # A regra
-        if CreateEPRE2EAction in actions:
-            paths = tuple((route[i], route[i+1]) for i in range(len(route) - 1))
-            for path in paths:
-                print(path)
-                #Criar par epr entre todos os nós do caminho
-                epr_list = [CreateEPRAction(path)]
-            roule[1] = epr_list
-                #Realizar o swap entre os eprs criados
-                
-        
-        if HighPurificationAction in actions:
-            # realizar a purificação de todos os pares epr do caminho
-            pass
-            
-        new_actions = []
-        print("Qualificando ações para a request", request)
-        for action in actions:
-            new_action = action()
-            print("Ação:", new_action)
-            if action == CreateEPRAction:
-                print("Ação CreateEPRAction")
-                new_action.set_nodes((request[0], request[1]))
-                new_actions.append(new_action)
-            elif action == SwapAction:
-                print("Ação SwapAction")
-                new_action.set_nodes((request[0], request[1]))
-                new_actions.append(new_action)
-            elif action == PurificationAction:
-                print("Ação PurificationAction")
-                new_action.set_nodes((request[0], request[1]))
-                new_actions.append(new_action)
-            elif action == DropRequestAction:
-                print("Ação DropRequestAction")
-                new_action.set_nodes((request[0], request[1]))
-                new_actions.append(new_action)
-            
-            # TODO: Considerar a possibilidade da ação ser None, ou dar um outro valor pra ela em apply_decision.
-        """
         return roule
+    
+    def run_roule(self, roule):
+        """
+        Executa as ações de um roule.
+
+        Args:
+            roule (dict): Dicionário com as ações que devem ser executadas.
+        """
+        
+        for action in roule:
+            action.run()
+        
