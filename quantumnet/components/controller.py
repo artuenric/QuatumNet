@@ -1,7 +1,7 @@
 import networkx as nx
 from ..components import Network, Host
 from ..objects.decision import SourceIsTarget, HighFidelity, NormalE2E
-from ..objects.action import DropRequestAction, HighPurificationAction, CreateEPRAction, SwapAction, PurificationAction, CreateEPRE2EAction
+from ..objects.action import DropRequestAction, HighPurificationAction, CreateEPRAction, SwapAction, PurificationAction
 
 class Controller():
     def __init__(self, network):
@@ -28,7 +28,7 @@ class Controller():
         """
         return {
             (SourceIsTarget(),): [DropRequestAction],            
-            (HighFidelity(),): [HighPurificationAction, CreateEPRE2EAction],
+            (HighFidelity(),): [HighPurificationAction],
             (NormalE2E(),): [CreateEPRAction, SwapAction, PurificationAction],
         }
     
