@@ -89,8 +89,25 @@ class NetworkLayer:
         self.logger.log('Nenhuma rota válida encontrada.')
         return None
 
+    def swap(self, pair_1: tuple, pair_2: tuple) -> bool:
+        """
+        Realiza o swapping de dois pares EPR entre dois hosts.
 
+        Args:
+            pair_1 (tuple): _description_
+            pair_2 (tuple): _description_
 
+        Returns:
+            bool: _description_
+        """
+
+        if pair_1[1] != pair_2[0]:
+            self.logger.log(f'Pares EPR não estão conectados corretamente: {pair_1[1]} != {pair_2[0]}')
+            return False
+
+        print(f"Swapping {pair_1} and {pair_2}")
+        
+        
     def entanglement_swapping(self, Alice: int = None, Bob: int = None) -> bool:
         """
         Realiza o Entanglement Swapping em toda a rota determinada pelo short_route_valid.

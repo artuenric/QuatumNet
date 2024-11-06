@@ -8,4 +8,5 @@ class SwapAction(Action):
         return f"Swap({self.pairs[0]}-{self.pairs[1]})"
     
     def run(self):
+        self.controller.network.networklayer.swap(self.pairs[0], self.pairs[1])
         pass
