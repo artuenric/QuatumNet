@@ -5,8 +5,9 @@ class Decision(ABC):
         self.name = name
         self.description = description
 
-    def __str__(self):
-        return f"Decision: {self.name} - {self.description}"
+    @abstractmethod
+    def __repr__(self):
+        pass
     
     @abstractmethod
     def verify(self, info: list):

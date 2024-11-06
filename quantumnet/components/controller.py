@@ -43,12 +43,10 @@ class Controller():
             actions (lista): Lista com as ações que devem ser executadas.
         """
         
-        print("Aplicando decisão do controlador para a request", request)
         for decision in self.decisions:
-            print("Decisões:", [d.description for d in decision])
             # Retorna a ação correspondente as decisões da tabela que são válidas para a request.
             if all(d.verify(request) for d in decision):
-                print("Decisão aplicada:", decision.__str__())
+                print("Decisão aplicada:", decision)
                 return self.decisions[decision]
 
         return [DropRequestAction]
