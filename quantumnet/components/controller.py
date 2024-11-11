@@ -86,13 +86,11 @@ class Controller():
         roule = {}
         
         for action in actions:
+            paths = [(route[i], route[i+1]) for i in range(len(route) - 1)]
             if action == CreateEPRAction:
-                paths = [(route[i], route[i+1]) for i in range(len(route) - 1)]
                 roule[1] = [CreateEPRAction(path, self) for path in paths]
             elif action == SwapAction:
-                pairs = [(route[i], route[i+1]) for i in range(len(route) - 1)]
-                roule[2] = [SwapAction(pairs[i], pairs[i+1], self) for i in range(len(pairs) - 1)]
-                
+                roule[2] = [SwapAction(path, self) for path in paths]
         return roule
     
     def run_roule(self, roule):
@@ -103,6 +101,7 @@ class Controller():
             roule (dict): Dicionário com as ações que devem ser executadas.
         """
         
-        for action in roule:
-            action.run()
+        for time in roule:
+            for action in roule[time]:
+                action.run()
         
