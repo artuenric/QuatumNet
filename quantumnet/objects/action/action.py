@@ -7,10 +7,23 @@ class Action(ABC):
         self.controller = controller
         self.time_slot = None
     
-    def set_nodes(self, nodes):
-        if len(nodes) != 2:
-            raise ValueError('Action must have exactly 2 nodes.')
-        self.nodes = nodes
+    def set_alice(self, id_alice):
+        """
+        Define o nó Alice da ação por meio de seu ID.
+
+        Args:
+            id_alice (int): ID do nó Alice.
+        """
+        self.alice = id_alice
+    
+    def set_bob(self, bob):
+        """
+        Define o nó Bob da ação por meio de seu ID.
+        
+        Args:
+            bob (int): ID do nó Bob.
+        """
+        self.bob = bob
         
     @abstractmethod
     def run(self):
