@@ -93,7 +93,7 @@ class PhysicalLayer:
         
         current_timeslot = self._network.get_timeslot()
         self._network.register_qubit_creation(qubit_id, current_timeslot, "Physical Layer")
-    
+
         self._count_qubit += 1
         self.logger.debug(f'Qubit {qubit_id} criado com fidelidade inicial {qubit.get_initial_fidelity()} e adicionado à memória do Host {host_id}.')
 
@@ -109,9 +109,11 @@ class PhysicalLayer:
         if increment_eprs:
             self.used_eprs += 1
             
-            
         epr = Epr(self._count_epr, fidelity)
         self._count_epr += 1
+        
+        self.logger.debug(f'Par EPR {epr} criado com fidelidade {fidelity}.')
+
         return epr
 
     def add_epr_to_channel(self, epr: Epr, channel: tuple):

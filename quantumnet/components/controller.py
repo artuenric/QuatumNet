@@ -1,14 +1,15 @@
 import networkx as nx
 from ..components import Network, Host
-from ..objects.decision import SourceIsTarget, HighFidelity, NormalE2E
-from ..objects.action import DropRequestAction, HighPurificationAction, CreateEPRAction, SwapAction, PurificationAction
+from ..objects.condition import SourceIsTargetCondition, HighFidelityCondition, NormalE2ECondition
+#from ..objects.action import DropRequestAction, HighPurificationAction, CreateEPRAction, SwapAction, PurificationAction
+from ..objects.roules import BasicRoule, HighFidelityRoule, DropRequestRoule
 
 class Controller():
     def __init__(self, network):
         self.network = network
         self.hosts = None
         self.links = None
-        self.decisions = self.set_decisions()
+        self.conditions = self.set_conditions()
     
     def calculate_route(self, source, target):
         """
@@ -22,34 +23,37 @@ class Controller():
         route = nx.shortest_path(G, source=source, target=target)
         return route
             
-    def set_decisions(self):
+    def set_conditions(self):
         """
-        Define as decisões do controlador para escolher as ações.
+        Define as condições do controlador para escolher as regras.
         """
         return {
-            (SourceIsTarget(),): [DropRequestAction],            
-            (HighFidelity(),): [HighPurificationAction],
-            (NormalE2E(),): [CreateEPRAction, SwapAction, PurificationAction],
+            (SourceIsTargetCondition(),): DropRequestRoule,            
+            (HighFidelityCondition(),): HighFidelityRoule,
+            (NormalE2ECondition(),): BasicRoule,
         }
     
-    def apply_decision(self, request):
+    def proactive_filling(self):
+        pass
+    
+    def apply_conditions(self, request):
         """
-        Aplica uma decisão do controlador para um match específico. Retorna a ação que deve ser executada.
+        Aplica uma condição do controlador para um match específico. Retorna a ação que deve ser executada.
 
         Args:
-            info (lista): Lista com as informações da request.
+            request (lista): Lista com as informações da request.
         
         Returns:
-            actions (lista): Lista com as ações que devem ser executadas.
+            roule (roule): Regra com as ações que devem ser executadas.
         """
         
-        for decision in self.decisions:
+        for condition in self.conditions:
             # Retorna a ação correspondente as decisões da tabela que são válidas para a request.
-            if all(d.verify(request) for d in decision):
-                print("Decisão aplicada:", decision)
-                return self.decisions[decision]
+            if all(d.verify(request) for d in condition):
+                print("Decisão aplicada:", condition)
+                return self.conditions[condition]
 
-        return [DropRequestAction]
+        return [DropRequestRoule]
         
     def add_match_route_roule_in_host(self, request, host):
         """
@@ -60,38 +64,24 @@ class Controller():
             host (Host): Host que terá o match, a rota e as ações adicionadas.
         """
         # Obtém as ações que devem ser executadas de acordo com as decisões do controlador.
-        actions = self.apply_decision(request)
+        roule = self.apply_conditions(request)
         # Calcula a rota para o destino (segundo item da lista) da request.
         route = self.calculate_route(request[0], request[1])
         # Qualifica as ações de acordo com as informações da request.
-        roule = self.qualify_actions(request, actions, route)
-        print("Ações qualificadas:", roule)
+        roule = self.qualify_roule(request, roule, route)
         # Adiciona a rota e as ações ao host.
         host.add_match_route_roule(request=request, route=route, roule=roule)
 
-    # Provavelmente o ideal seria um método para cada tipo de ação, mas por enquanto vamos manter assim
-    # LITERALMENTE PROTOCOLOS
-    def qualify_actions(self, request, actions, route):
+    def qualify_roule(self, request, roule, route):
         """
-        Qualifica uma ação de acordo com as informações da request.
+        Qualifica uma regra de acordo com as informações da request e da rede.
 
         Args:
             request (list): Lista com as informações da request.
-            actions (list): Lista com as ações que devem ser executadas.
+            roule (roule): Regra com as ações que devem ser executadas.
             route (list): Lista com a rota para o destino.
         """
-        # TODO: Aqui também vai ser considerado o time-slot etc. Essa é uma função ABSURDAMENTE importante uma das mais complexas.
-        # TODO: Cada regra deve conter várias ações, provavelmente repetidas, mas com informações diferentes. Por isso, essa parte do código deve ser alterada futuramente. Focando em abstrair o processo.
-        
-        roule = {}
-        
-        for action in actions:
-            paths = [(route[i], route[i+1]) for i in range(len(route) - 1)]
-            if action == CreateEPRAction:
-                roule[1] = [CreateEPRAction(path, self) for path in paths]
-            elif action == SwapAction:
-                roule[2] = [SwapAction(path, self) for path in paths]
-        return roule
+        return roule(request, route, self)
     
     def run_roule(self, roule):
         """
@@ -100,8 +90,5 @@ class Controller():
         Args:
             roule (dict): Dicionário com as ações que devem ser executadas.
         """
-        
-        for time in roule:
-            for action in roule[time]:
-                action.run()
+        roule.run()
         

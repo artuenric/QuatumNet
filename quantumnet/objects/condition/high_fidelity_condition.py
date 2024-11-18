@@ -1,5 +1,6 @@
-from .decision import Decision
-class HighFidelity(Decision):
+from .condition import Condition
+
+class HighFidelityCondition(Condition):
     def __init__(self):
         name = "High Fidelity"
         description = "If the request has a high fidelity"

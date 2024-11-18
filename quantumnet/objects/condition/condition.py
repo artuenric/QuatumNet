@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-class Decision(ABC):
+class Condition(ABC):
     def __init__(self, name: str, description: str):
         self.name = name
         self.description = description

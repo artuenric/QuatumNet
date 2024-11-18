@@ -10,7 +10,7 @@ class NetworkLayer:
         
         args:
             network : Network : Rede.
-            link_layer : LinkLayer : Camada de enlace.
+            link_layer : Layer : Camada de enlace.
             physical_layer : PhysicalLayer : Camada física.
         """
         self._network = network
@@ -89,23 +89,61 @@ class NetworkLayer:
         self.logger.log('Nenhuma rota válida encontrada.')
         return None
 
-    def swap(self, pair_1: tuple, pair_2: tuple) -> bool:
+    def swap(self, alice, bob, mid):
         """
-        Realiza o swapping de dois pares EPR entre dois hosts.
+        Realiza o swapping de entrelaçamento entre três nós.
 
-        Args:
-            pair_1 (tuple): _description_
-            pair_2 (tuple): _description_
-
-        Returns:
-            bool: _description_
+        args:
+            alice (int): ID do host de origem.
+            bob (int): ID do host de destino.
+            mid (int): ID do host intermediário.
+            
+        returns:
+            bool: True se o swapping foi bem-sucedido, False caso contrário.
         """
-
-        if pair_1[1] != pair_2[0]:
-            self.logger.log(f'Pares EPR não estão conectados corretamente: {pair_1[1]} != {pair_2[0]}')
+        self._network.timeslot()
+        eprs_alice_mid = self._network.get_eprs_from_edge(alice, mid)
+        eprs_mid_bob = self._network.get_eprs_from_edge(mid, bob)
+        
+        # Checa se existe pares EPR entre os hosts
+        if eprs_alice_mid < 0 or eprs_mid_bob < 0:
+            return False
+        
+        # Coleta os pares EPR
+        epr1 = eprs_alice_mid[0]
+        epr2 = eprs_mid_bob[0]
+                    
+        # Remove os pares EPR dos canais
+        self._network.physical.remove_epr_from_channel(epr1, (alice, mid))
+        self._network.physical.remove_epr_from_channel(epr2, (mid, bob))
+        
+        # Mede a fidelidade dos pares EPR
+        fidelity1 = epr1.get_current_fidelity()
+        fidelity2 = epr2.get_current_fidelity()
+        
+        # Calcula a probabilidade de sucesso do entanglement swapping
+        success_prob = fidelity1 * fidelity2 + (1 - fidelity1) * (1 - fidelity2)
+        
+        # Define o sucesso do swapping com base na probabilidade de sucesso
+        if uniform(0, 1) > success_prob:
+            self.logger.log(f'Entanglement Swapping falhou entre {alice}-{mid} e {mid}-{bob}')
             return False
 
-        print(f"Swapping {pair_1} and {pair_2}")
+        # Calcula a nova fidelidade do par EPR virtual
+        new_fidelity = (fidelity1 * fidelity2) / ((fidelity1 * fidelity2) + (1 - fidelity1) * (1 - fidelity2))
+        virtual_epr = Epr((alice, bob), new_fidelity)
+
+        # Se o canal entre node1 e node3 não existir, adiciona um novo canal
+        if not self._network.graph.has_edge(alice, bob):
+            self._network.graph.add_edge(alice, bob, virtual_eprs=[virtual_epr])
+
+        # Adiciona o par EPR virtual ao canal entre node1 e node3
+        self._network.physical.add_epr_to_channel(epr_virtual, (alice, bob))
+
+        # Atualiza o contador de EPRs utilizados
+        self.used_eprs += 1
+
+        
         
         
     def entanglement_swapping(self, Alice: int = None, Bob: int = None) -> bool:

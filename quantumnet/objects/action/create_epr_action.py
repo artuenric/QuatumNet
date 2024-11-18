@@ -14,10 +14,10 @@ class CreateEPRAction(Action):
         self.set_bob(bob)
     
     def __repr__(self):
-        return f"CreateEPR({self.nodes[0]}-{self.nodes[1]})"
+        return f"CreateEPR({self.alice}-{self.bob})"
     
     def run(self):
         """
         Cria um par EPR entre dois nós.
         """
-        self.controller.network.physical.create_epr_pair(self.nodes[0], self.nodes[1])
+        self.controller.network.physical.echp_on_demand(self.alice, self.bob)

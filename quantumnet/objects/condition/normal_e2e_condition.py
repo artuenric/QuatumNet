@@ -1,5 +1,6 @@
-from .decision import Decision
-class NormalE2E(Decision):
+from .condition import Condition
+
+class NormalE2ECondition(Condition):
     def __init__(self):
         name = "Normal E2E"
         description = "If the request is a normal E2E request."

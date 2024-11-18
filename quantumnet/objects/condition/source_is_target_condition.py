@@ -1,5 +1,6 @@
-from .decision import Decision
-class SourceIsTarget(Decision):
+from .condition import Condition
+
+class SourceIsTargetCondition(Condition):
     def __init__(self):
         name = "Source is Target"
         description = "If the source is the target of the request"
