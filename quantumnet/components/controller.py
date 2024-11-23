@@ -33,9 +33,6 @@ class Controller():
             (NormalE2ECondition(),): BasicRoule,
         }
     
-    def proactive_filling(self):
-        pass
-    
     def apply_conditions(self, request):
         """
         Aplica uma condição do controlador para um match específico. Retorna a ação que deve ser executada.
