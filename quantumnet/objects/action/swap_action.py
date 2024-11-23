@@ -10,4 +10,4 @@ class SwapAction(Action):
         return f"Swap({self.alice}-{self.bob})"
     
     def run(self):
-        self.controller.network.linklayer.request(self.alice, self.bob)
+        self.controller.network.networklayer.swap(self.alice, self.bob, self.midlle_node)
