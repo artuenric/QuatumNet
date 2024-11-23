@@ -106,7 +106,7 @@ class NetworkLayer:
         eprs_mid_bob = self._network.get_eprs_from_edge(mid, bob)
         
         # Checa se existe pares EPR entre os hosts
-        if eprs_alice_mid < 0 or eprs_mid_bob < 0:
+        if (len(eprs_alice_mid) < 0) or (len(eprs_mid_bob) < 0):
             return False
         
         # Coleta os pares EPR
@@ -135,15 +135,13 @@ class NetworkLayer:
 
         # Se o canal entre node1 e node3 não existir, adiciona um novo canal
         if not self._network.graph.has_edge(alice, bob):
-            self._network.graph.add_edge(alice, bob, virtual_eprs=[virtual_epr])
+            self._network.graph.add_edge(alice, bob, eprs=[virtual_epr], virtual_link=True)
 
         # Adiciona o par EPR virtual ao canal entre node1 e node3
-        self._network.physical.add_epr_to_channel(epr_virtual, (alice, bob))
+        self._network.physical.add_epr_to_channel(virtual_epr, (alice, bob))
 
         # Atualiza o contador de EPRs utilizados
         self.used_eprs += 1
-
-        
         
         
     def entanglement_swapping(self, Alice: int = None, Bob: int = None) -> bool:
