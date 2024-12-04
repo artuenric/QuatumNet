@@ -2,7 +2,7 @@ from importlib import import_module
 from pkgutil import iter_modules
 from sys import modules
 from os import path
-from .roule import Roule
+from .rule import Rule
 
 # Define o diretório deste módulo
 module_dir = path.dirname(__file__)
@@ -15,5 +15,5 @@ for _, module_name, _ in iter_modules([module_dir]):
     # Obtém todas as classes no módulo e as adiciona ao namespace do pacote
     for attr_name in dir(module):
         attr = getattr(module, attr_name)
-        if isinstance(attr, type) and issubclass(attr, Roule) and attr is not Roule:
+        if isinstance(attr, type) and issubclass(attr, Rule) and attr is not Rule:
             setattr(modules[__name__], attr_name, attr)

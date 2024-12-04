@@ -1,7 +1,7 @@
-from .roule import Roule
+from .rule import Rule
 from ..action import CreateEPRAction, SwapAction
 
-class BasicRoule(Roule):
+class BasicRule(Rule):
     def __init__(self, request, route, controller):
         super().__init__("BasicRoule")
         self.controller = controller
@@ -12,7 +12,13 @@ class BasicRoule(Roule):
         # Criar EPR entre os hosts da rota
         self.actions[1] = []
         for i in range(len(self.route)-1):
-            self.actions[1].append(CreateEPRAction(self.route[i], self.route[i+1], self.controller))
+            if self.controller.network.edges[self.route[i], self.route[i+1]]['virtual_link'] == True:
+                # Se a aresta for virtual, ignorar
+                continue
+            if len(self.controller.network.edges[self.route[i], self.route[i+1]]['eprs']) == 0:
+                # Se não houver pares epr, criar
+                self.actions[1].append(CreateEPRAction(self.route[i], self.route[i+1], self.controller))
+        
         # Swap entre os pares EPR do caminho
         self.actions[2] = []
         for a, m, b in zip(self.route, self.route[1:], self.route[2:]):

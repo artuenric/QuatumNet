@@ -1,12 +1,12 @@
 from abc import ABC, abstractmethod
-class Roule(ABC):
-    def __init__(self, roule_name):
-        self.roule_name = roule_name
+class Rule(ABC):
+    def __init__(self, rule_name):
+        self.rule_name = rule_name
         self.actions = {}
         self.route = []
     
     def __repr__(self):
-        return f"{self.roule_name}"
+        return f"{self.rule_name}"
     
     def set_route(self, route):
         """

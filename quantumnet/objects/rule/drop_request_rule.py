@@ -1,7 +1,7 @@
-from .roule import Roule
+from .rule import Rule
 from ..action import DropRequestAction
 
-class DropRequestRoule(Roule):
+class DropRequestRule(Rule):
     def __init__(self, controller):
         super().__init__("BasicRoule")
         self.controller = controller

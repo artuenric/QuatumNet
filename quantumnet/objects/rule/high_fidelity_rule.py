@@ -1,12 +1,12 @@
-from .roule import Roule
+from .rule import Rule
 from ..action import CreateEPRAction
 
-class HighFidelityRoule(Roule):
+class HighFidelityRule(Rule):
     def __init__(self, controller):
         super().__init__("HighFidelityRoule")
         self.controller = controller
         
-    def behavior(self,):
+    def behavior(self):
         # Criar EPR entre os hosts da rota
         self.actions[1] = []
         for i in range(len(self.route)):
