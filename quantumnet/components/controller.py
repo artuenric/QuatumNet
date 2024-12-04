@@ -2,7 +2,7 @@ import networkx as nx
 from ..components import Network, Host
 from ..objects.condition import SourceIsTargetCondition, HighFidelityCondition, NormalE2ECondition
 #from ..objects.action import DropRequestAction, HighPurificationAction, CreateEPRAction, SwapAction, PurificationAction
-from ..objects.roules import BasicRoule, HighFidelityRoule, DropRequestRoule
+from ..objects.rule import BasicRule, HighFidelityRule, DropRequestRule
 
 class Controller():
     def __init__(self, network):
@@ -28,9 +28,9 @@ class Controller():
         Define as condições do controlador para escolher as regras.
         """
         return {
-            (SourceIsTargetCondition(),): DropRequestRoule,            
-            (HighFidelityCondition(),): HighFidelityRoule,
-            (NormalE2ECondition(),): BasicRoule,
+            (SourceIsTargetCondition(),): DropRequestRule,            
+            (HighFidelityCondition(),): HighFidelityRule,
+            (NormalE2ECondition(),): BasicRule,
         }
     
     def apply_conditions(self, request):
@@ -50,7 +50,7 @@ class Controller():
                 print("Decisão aplicada:", condition)
                 return self.conditions[condition]
 
-        return [DropRequestRoule]
+        return [DropRequestRule]
         
     def add_match_route_roule_in_host(self, request, host):
         """
@@ -88,4 +88,4 @@ class Controller():
             roule (dict): Dicionário com as ações que devem ser executadas.
         """
         roule.run()
-        
+    

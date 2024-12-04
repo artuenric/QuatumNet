@@ -7,7 +7,7 @@ class SwapAction(Action):
         self.midlle_node = middle
         
     def __repr__(self):
-        return f"Swap({self.alice}-{self.bob})"
+        return f"Swap({self.alice}-{self.midlle_node}-{self.bob})"
     
     def run(self):
         self.controller.network.networklayer.swap(self.alice, self.bob, self.midlle_node)
