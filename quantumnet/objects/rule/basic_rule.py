@@ -3,10 +3,10 @@ from ..action import CreateEPRAction, SwapAction
 
 class BasicRule(Rule):
     def __init__(self, request, route, controller):
-        super().__init__("BasicRule")  # Corrigido nome da regra
+        super().__init__("BasicRule")  
         self.controller = controller
         self.route = route
-        self.behavior()  # Define as ações
+        self.behavior() 
     
     def behavior(self):
         """Define as ações necessárias para a rota."""
@@ -39,15 +39,19 @@ class BasicRule(Rule):
         current_time = 2
         remaining_route = self.route[:]
         
-        while len(remaining_route) > 2:  # Enquanto houver mais de dois nós na rota
+        # Enquanto houver mais de dois nós na rota
+        while len(remaining_route) > 2:
             self.actions[current_time] = []
-            
+
             # Adicionar swaps para pares consecutivos
-            for a, m, b in zip(remaining_route, remaining_route[1:], remaining_route[2:]):
+            for i in range(1, len(remaining_route) - 1, 2):
+                a = remaining_route[i - 1]  # Nó anterior
+                m = remaining_route[i]      # Nó intermediário
+                b = remaining_route[i + 1]  # Nó seguinte
                 self.actions[current_time].append(SwapAction(a, b, m, self.controller))
-            
-            # Atualizar a rota para pares reduzidos (simulação de fim-a-fim)
-            remaining_route = remaining_route[::2]
+
+            # Atualizar a rota reduzindo intermediários
+            remaining_route = [remaining_route[i] for i in range(0, len(remaining_route), 2)]
             current_time += 1
     
     def run(self):
