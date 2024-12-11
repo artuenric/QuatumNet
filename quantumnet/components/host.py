@@ -114,24 +114,15 @@ class Host():
         """
         Inicia a tabela de fluxo do host.
         """
-        #[match]: (roule)
+        #[match]: (rule)
         # o mesmo que
-        #[match]: ([roule], [route])
+        #[match]: ([rule], [route])
         
         return {
         }
     
-    def requests_match_roule(self, request):
-        """
-        Requisita uma ação de um match na tabela de fluxo ao controlador.
-        
-        Returns:
-            list : Retorna a ação que deve ser executada.
-        """
-        #TODO: Implementar a busca por match na tabela de fluxo.
-        pass
     
-    def find_roule_by_request(self, request):
+    def find_rule_by_request(self, request):
         """
         Verifica se há ações para um match na tabela de fluxo, dado uma request.
         
@@ -153,11 +144,12 @@ class Host():
                         return self._flow_table[match]
         return False
     
-    def add_match_route_roule(self, request, route, roule):
+    def add_match_route_rule(self, request, route, rule):
         """
         Adiciona um match, rota e ação à tabela de fluxo.
         """
-        self._flow_table[(request[1], request[2], request[3])] = (route, roule)
+        print('Adicionando match, rota e regra à tabela de fluxo.')
+        self._flow_table[(request[1], request[2], request[3])] = (route, rule)
         
         
     
@@ -165,4 +157,4 @@ class Host():
 ## Request é o que chega, comparado ao match, são diferentes apenas pelo primeiro item. Que no request é o host_id do host que está enviando a requisição.
 ## Route é a rota que o pacote deve seguir.
 # Actions são as ações que devem ser executadas. Especificamente classes. O controlador executará essas ações por meio da rede.
-# Roules são conjuntos de ações.
+# rules são conjuntos de ações.

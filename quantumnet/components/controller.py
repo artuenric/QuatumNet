@@ -41,7 +41,7 @@ class Controller():
             request (lista): Lista com as informações da request.
         
         Returns:
-            roule (roule): Regra com as ações que devem ser executadas.
+            rule (rule): Regra com as ações que devem ser executadas.
         """
         
         for condition in self.conditions:
@@ -52,7 +52,7 @@ class Controller():
 
         return [DropRequestRule]
         
-    def add_match_route_roule_in_host(self, request, host):
+    def add_match_route_rule_in_host(self, request, host):
         """
         Adiciona um match, uma rota e ações ao host. Isso é feito após a decisão do controlador e utilizando o método add_match_actions do host.
 
@@ -61,31 +61,31 @@ class Controller():
             host (Host): Host que terá o match, a rota e as ações adicionadas.
         """
         # Obtém as ações que devem ser executadas de acordo com as decisões do controlador.
-        roule = self.apply_conditions(request)
+        rule = self.apply_conditions(request)
         # Calcula a rota para o destino (segundo item da lista) da request.
         route = self.calculate_route(request[0], request[1])
         # Qualifica as ações de acordo com as informações da request.
-        roule = self.qualify_roule(request, roule, route)
+        rule = self.qualify_rule(request, rule, route)
         # Adiciona a rota e as ações ao host.
-        host.add_match_route_roule(request=request, route=route, roule=roule)
+        host.add_match_route_rule(request=request, route=route, rule=rule)
 
-    def qualify_roule(self, request, roule, route):
+    def qualify_rule(self, request, rule, route):
         """
         Qualifica uma regra de acordo com as informações da request e da rede.
 
         Args:
             request (list): Lista com as informações da request.
-            roule (roule): Regra com as ações que devem ser executadas.
+            rule (rule): Regra com as ações que devem ser executadas.
             route (list): Lista com a rota para o destino.
         """
-        return roule(request, route, self)
+        return rule(request, route, self)
     
-    def run_roule(self, roule):
+    def run_rule(self, rule):
         """
-        Executa as ações de um roule.
+        Executa as ações de um rule.
 
         Args:
-            roule (dict): Dicionário com as ações que devem ser executadas.
+            rule (dict): Dicionário com as ações que devem ser executadas.
         """
-        roule.run()
+        rule.run()
     

@@ -2,7 +2,7 @@ from .rule import Rule
 from ..action import CreateEPRAction
 
 class HighFidelityRule(Rule):
-    def __init__(self, controller):
+    def __init__(self, request, route, controller):
         super().__init__("HighFidelityRoule")
         self.controller = controller
         
@@ -16,4 +16,7 @@ class HighFidelityRule(Rule):
         
     
     def prepare(self, controller):
+        pass
+    
+    def run(self):
         pass
