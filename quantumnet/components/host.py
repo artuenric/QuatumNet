@@ -1,4 +1,4 @@
-
+from tabulate import tabulate
 from ..objects import Logger, Qubit
 
 class Host():
@@ -58,6 +58,16 @@ class Host():
         """
         return self._flow_table
     
+    def draw_flow_table(self):
+        """
+        Desenha a tabela de fluxo do host em formato de tabela.
+        """
+        table = []
+        for match, (route, rule) in self._flow_table.items():
+            table.append([match, route, rule])
+
+        print(tabulate(table, headers=["Match", "Route", "Rule"], tablefmt="grid"))
+
     def get_last_qubit(self):
         """
         Retorna o último qubit da memória.
@@ -144,12 +154,17 @@ class Host():
                         return self._flow_table[match]
         return False
     
-    def add_match_route_rule(self, request, route, rule):
+    def add_match_route_rule(self, bob, fmin, neprs, route, rule):
         """
         Adiciona um match, rota e ação à tabela de fluxo.
+            Args:
+                bob (int): ID do host de destino.
+                fmin (int): Fidelidade mínima.
+                neprs (int): Número de pares EPR.
+                route (list): Lista com a rota que a requisição deve seguir.
+                rule (list): Lista com as ações que devem ser executadas.
         """
-        print('Adicionando match, rota e regra à tabela de fluxo.')
-        self._flow_table[(request[1], request[2], request[3])] = (route, rule)
+        self._flow_table[(bob, fmin, neprs)] = (route, rule)
         
         
     

@@ -1,14 +1,15 @@
 import networkx as nx
 from ..components import Network, Host
 from ..control.condition import SourceIsTargetCondition, HighFidelityCondition, NormalE2ECondition
-from ..control.rule import DropRequestRule
-from ..control.table import ProactiveTable, ReactiveTable
+from ..control.rule import DropRequestRule, BasicRuleProactive
+from ..control.table import ReactiveTable
 class Controller():
     def __init__(self, network):
         self.network = network
         self.hosts = None
         self.links = None
         self.conditions_table = None
+        self.set_conditions_table(ReactiveTable())
     
     def calculate_route(self, source, target):
         """
@@ -50,14 +51,15 @@ class Controller():
 
         return [DropRequestRule]
         
-    def add_match_route_rule_in_host(self, request, host):
+    def add_match_route_rule_in_host_reactive(self, request):
         """
         Adiciona um match, uma rota e ações ao host. Isso é feito após a decisão do controlador e utilizando o método add_match_actions do host.
+        Nesse cenário, o controlador é reativo, ou seja, ele toma decisões com base na chegada de uma request.
 
         Args:
             request (list): Lista com as informações da request.
-            host (Host): Host que terá o match, a rota e as ações adicionadas.
         """
+        alice, bob, fmin, neprs = request[0], request[1], request[2], request[3]
         # Obtém as ações que devem ser executadas de acordo com as decisões do controlador.
         rule = self.apply_conditions(request)
         # Calcula a rota para o destino (segundo item da lista) da request.
@@ -65,7 +67,26 @@ class Controller():
         # Qualifica as ações de acordo com as informações da request.
         rule = self.qualify_rule(rule, route)
         # Adiciona a rota e as ações ao host.
-        host.add_match_route_rule(request=request, route=route, rule=rule)
+        self.network.get_host(alice).add_match_route_rule(bob, fmin, neprs, route, rule)
+
+    def add_match_route_rule_in_host_proactive(self, alice, bob, fmin, neprs):
+        """
+        Adiciona um match, uma rota e ações ao host. Isso é feito após a decisão do controlador e utilizando o método add_match_actions do host.
+        Nesse cenário, o controlador é proativo, ou seja, ele preenche a tabela com base em informações da rede.
+
+        Args:
+            alice (int): ID do host de origem.
+            bob (int): ID do host de destino.
+            fmin (float): Fidelidade mínima para a comunicação.
+            neprs (int): Número de EPRs necessários para a comunicação.
+        """
+        route = self.calculate_route(alice, bob)
+        # Cria a regra
+        rule = BasicRuleProactive
+        # Qualifica as ações de acordo com as informações da request.
+        rule = self.qualify_rule(rule, route)
+        # Adiciona a rota e as ações ao host.
+        self.network.get_host(alice).add_match_route_rule(bob, fmin, neprs, route, rule)
 
     def qualify_rule(self, rule, route):
         """
