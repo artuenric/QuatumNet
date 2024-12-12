@@ -1,8 +1,8 @@
 from .rule import Rule
 from ..action import CreateEPRAction, SwapAction
 
-class BasicRule(Rule):
-    def __init__(self, request, route, controller):
+class BasicRuleReactive(Rule):
+    def __init__(self, route, controller):
         super().__init__("BasicRule")  
         self.controller = controller
         self.route = route

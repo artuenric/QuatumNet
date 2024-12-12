@@ -1,15 +1,14 @@
 import networkx as nx
 from ..components import Network, Host
-from ..objects.condition import SourceIsTargetCondition, HighFidelityCondition, NormalE2ECondition
-#from ..objects.action import DropRequestAction, HighPurificationAction, CreateEPRAction, SwapAction, PurificationAction
-from ..objects.rule import BasicRule, HighFidelityRule, DropRequestRule
-
+from ..control.condition import SourceIsTargetCondition, HighFidelityCondition, NormalE2ECondition
+from ..control.rule import DropRequestRule
+from ..control.table import ProactiveTable, ReactiveTable
 class Controller():
     def __init__(self, network):
         self.network = network
         self.hosts = None
         self.links = None
-        self.conditions = self.set_conditions()
+        self.conditions_table = None
     
     def calculate_route(self, source, target):
         """
@@ -22,17 +21,16 @@ class Controller():
         G = self.network.graph
         route = nx.shortest_path(G, source=source, target=target)
         return route
-            
-    def set_conditions(self):
+    
+    def set_conditions_table(self, table):
         """
         Define as condições do controlador para escolher as regras.
+
+        Returns:
+            dict: Dicionário com as condições e as regras correspondentes.
         """
-        return {
-            (SourceIsTargetCondition(),): DropRequestRule,            
-            (HighFidelityCondition(),): HighFidelityRule,
-            (NormalE2ECondition(),): BasicRule,
-        }
-    
+        self.conditions_table = table.conditions
+        
     def apply_conditions(self, request):
         """
         Aplica uma condição do controlador para um match específico. Retorna a ação que deve ser executada.
@@ -44,11 +42,11 @@ class Controller():
             rule (rule): Regra com as ações que devem ser executadas.
         """
         
-        for condition in self.conditions:
+        for condition in self.conditions_table:
             # Retorna a ação correspondente as decisões da tabela que são válidas para a request.
             if all(d.verify(request) for d in condition):
                 print("Decisão aplicada:", condition)
-                return self.conditions[condition]
+                return self.conditions_table[condition]
 
         return [DropRequestRule]
         
@@ -65,11 +63,11 @@ class Controller():
         # Calcula a rota para o destino (segundo item da lista) da request.
         route = self.calculate_route(request[0], request[1])
         # Qualifica as ações de acordo com as informações da request.
-        rule = self.qualify_rule(request, rule, route)
+        rule = self.qualify_rule(rule, route)
         # Adiciona a rota e as ações ao host.
         host.add_match_route_rule(request=request, route=route, rule=rule)
 
-    def qualify_rule(self, request, rule, route):
+    def qualify_rule(self, rule, route):
         """
         Qualifica uma regra de acordo com as informações da request e da rede.
 
@@ -78,7 +76,7 @@ class Controller():
             rule (rule): Regra com as ações que devem ser executadas.
             route (list): Lista com a rota para o destino.
         """
-        return rule(request, route, self)
+        return rule(route, self)
     
     def run_rule(self, rule):
         """
