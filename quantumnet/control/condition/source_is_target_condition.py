@@ -13,6 +13,6 @@ class SourceIsTargetCondition(Condition):
         """
         Verifica se a regra é válida de acordo com as informações da request.
         """
-        if request[1] == request[0]:
+        if request.alice == request.bob:
             return True
         return False

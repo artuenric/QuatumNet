@@ -13,8 +13,7 @@ class NormalE2ECondition(Condition):
         """
         Verifica se a request é uma request normal.
         """
-
-        if all(type(r) == int or type(r) == float for r in request):
-            if all(r > 0 for r in request[2:]):
+        if type(request.alice) == int and type(request.bob) == int:
+            if request.fmin > 0 and request.neprs > 0:
                 return True
         return False

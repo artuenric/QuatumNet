@@ -1,4 +1,5 @@
 from random import uniform, randint
+from quantumnet.objects.request import Request
 
 def generate_random_request(num_hosts, fmin_range=(0.5, 1.0), eprs_range=(1, 10)):
     """
@@ -20,6 +21,6 @@ def generate_random_request(num_hosts, fmin_range=(0.5, 1.0), eprs_range=(1, 10)
         bob_id = randint(0, num_hosts - 1)
 
     fmin = round(uniform(*fmin_range), 2)  
-    eprs = randint(*eprs_range)            
+    neprs = randint(*eprs_range)            
 
-    return [alice_id, bob_id, fmin, eprs]
+    return Request(alice_id, bob_id, fmin, neprs)

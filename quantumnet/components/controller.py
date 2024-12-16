@@ -37,7 +37,7 @@ class Controller():
         Aplica uma condição do controlador para um match específico. Retorna a ação que deve ser executada.
 
         Args:
-            request (lista): Lista com as informações da request.
+            request (Request): Requisição que contém as informações da comunicação.
         
         Returns:
             rule (rule): Regra com as ações que devem ser executadas.
@@ -57,13 +57,13 @@ class Controller():
         Nesse cenário, o controlador é reativo, ou seja, ele toma decisões com base na chegada de uma request.
 
         Args:
-            request (list): Lista com as informações da request.
+            request (Request): Requisição que contém as informações da comunicação.
         """
-        alice, bob, fmin, neprs = request[0], request[1], request[2], request[3]
+        alice, bob, fmin, neprs = request.alice, request.bob, request.fmin, request.neprs
         # Obtém as ações que devem ser executadas de acordo com as decisões do controlador.
         rule = self.apply_conditions(request)
         # Calcula a rota para o destino (segundo item da lista) da request.
-        route = self.calculate_route(request[0], request[1])
+        route = self.calculate_route(request.alice, request.bob)
         # Qualifica as ações de acordo com as informações da request.
         rule = self.qualify_rule(rule, route)
         # Adiciona a rota e as ações ao host.

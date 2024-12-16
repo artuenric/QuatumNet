@@ -146,11 +146,11 @@ class Host():
         # Percorre a tabela de fluxo.
         for match in self._flow_table:
             # Se o segundo item da request (o destino) for igual ao primeiro item do match (o destino).
-            if request[1] == match[0]:
+            if request.bob == match[0]:
                 # Se o terceiro item da request (a Fmin) for menor ou igual ao segundo item do match (a Fmin).
-                if request[2] <= match[1]:
+                if request.fmin <= match[1]:
                     # Se o quarto item da request (o número de pares EPR) for maior ou igual ao terceiro item do match (o número de pares EPR).
-                    if request[3] <= match[2]:
+                    if request.neprs <= match[2]:
                         return self._flow_table[match]
         return False
     

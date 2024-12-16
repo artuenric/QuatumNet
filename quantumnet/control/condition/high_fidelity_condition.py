@@ -10,6 +10,6 @@ class HighFidelityCondition(Condition):
         return f"{self.name}"
     
     def verify(self, request):
-        if request[2] >= 0.9:
+        if request.fmin >= 0.9:
             return True
         return False

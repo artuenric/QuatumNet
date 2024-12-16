@@ -10,11 +10,11 @@ class Condition(ABC):
         pass
     
     @abstractmethod
-    def verify(self, info: list):
+    def verify(self, request):
         """
         Verifica se a regra é válida de acordo com as informações da request.
 
         Args:
-            info (list): lista de informações que devem ser verificadas do request.
+            request (Request): Requisição que contém as informações da comunicação.
         """
         pass
