@@ -57,7 +57,7 @@ class BasicRuleReactive(Rule):
     def run(self):
         """Executa as ações no tempo certo."""
         for time in sorted(self.actions.keys()):
-            print(f"Tempo: {time}")
+            print(f"Passo: {time}")
             for action in self.actions[time]:
-                print(f"Executando ação: {action}")
+                print(f"    Ação: {action}")
                 action.run()
