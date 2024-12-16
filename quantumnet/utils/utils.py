@@ -1,5 +1,8 @@
 from random import uniform, randint
 from quantumnet.objects.request import Request
+# Registro
+import csv
+import os
 
 def generate_random_request(num_hosts, fmin_range=(0.5, 1.0), eprs_range=(1, 10)):
     """
@@ -24,3 +27,26 @@ def generate_random_request(num_hosts, fmin_range=(0.5, 1.0), eprs_range=(1, 10)
     neprs = randint(*eprs_range)            
 
     return Request(alice_id, bob_id, fmin, neprs)
+
+# Função para registrar os dados no CSV
+def register_request(request, estado_registro, filename="requests_data.csv"):
+    """
+    Registra as informações da request no CSV.
+    
+    Args:  
+        request: objeto da request a ser registrada.
+        estado_registro: se a request foi nova ou já tinha registro.
+        filename: nome do arquivo CSV (padrão: "requests_data.csv").
+    """
+    # Verifica se o arquivo já existe para adicionar o cabeçalho se necessário
+    file_exists = os.path.exists(filename)
+    
+    with open(filename, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        
+        # Se o arquivo não existe, adiciona o cabeçalho
+        if not file_exists:
+            writer.writerow(["ID", "Alice", "Bob", "Fidelidade Mínima", "Número de EPRs", "Início", "Término", "Novo Registro"])
+        
+        # Escreve os dados da request
+        writer.writerow([str(request), request.alice, request.bob, request.fmin, request.neprs, request.starttime, request.endtime, estado_registro])
