@@ -280,14 +280,12 @@ class Network():
                 self._graph.edges[edge]['eprs'].append(epr)
                 self.logger.debug(f'Par EPR {epr} adicionado ao canal.')
         print("Pares EPRs adicionados")
-
-        
+     
     def timeslot(self):
         """
         Incrementa o timeslot da rede.
         """
         self.timeslot_total += 1
-        self.apply_decoherence_to_all_layers()
 
     def get_timeslot(self):
         """
@@ -318,8 +316,7 @@ class Network():
         else:
             for qubit_id, info in self.qubit_timeslots.items():
                 print(f"Qubit {qubit_id} foi criado no timeslot {info['timeslot']} na camada {info['layer']}")
-                
-                
+                          
     def get_total_useds_eprs(self):
         """
         Retorna o número total de EPRs (pares entrelaçados) utilizados na rede.
@@ -399,26 +396,3 @@ class Network():
                 return metrics
             else:
                 raise ValueError("Tipo de saída inválido. Escolha entre 'print', 'csv' ou 'variable'.")
-
-    def apply_decoherence_to_all_layers(self, decoherence_factor: float = 0.9):
-        """
-        Aplica decoerência a todos os qubits e EPRs nas camadas da rede que já avançaram nos timeslots.
-        """
-        current_timeslot = self.get_timeslot()
-
-        # Aplicar decoerência nos qubits de cada host
-        for host_id, host in self.hosts.items():
-            for qubit in host.memory:
-                creation_timeslot = self.qubit_timeslots[qubit.qubit_id]['timeslot']
-                if creation_timeslot < current_timeslot:
-                    current_fidelity = qubit.get_current_fidelity()
-                    new_fidelity = current_fidelity * decoherence_factor
-                    qubit.set_current_fidelity(new_fidelity)
-
-        # Aplicar decoerência nos EPRs em todos os canais (arestas da rede)
-        for edge in self.edges:
-            if 'eprs' in self._graph.edges[edge]:
-                for epr in self._graph.edges[edge]['eprs']:
-                    current_fidelity = epr.get_current_fidelity()
-                    new_fidelity = current_fidelity * decoherence_factor
-                    epr.set_fidelity(new_fidelity)

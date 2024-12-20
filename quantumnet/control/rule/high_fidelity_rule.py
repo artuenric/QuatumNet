@@ -13,10 +13,3 @@ class HighFidelityRule(Rule):
             self.actions[1].append(CreateEPRAction(self.route[i], self.route[i+1], self.controller))
         
         self.actions[2] = []
-        
-    
-    def prepare(self, controller):
-        pass
-    
-    def run(self):
-        pass

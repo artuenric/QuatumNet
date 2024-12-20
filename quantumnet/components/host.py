@@ -1,5 +1,6 @@
 from tabulate import tabulate
 from ..objects import Logger, Qubit
+from math import exp
 
 class Host():
     def __init__(self, host_id: int, probability_on_demand_qubit_create: float = 0.5, probability_replay_qubit_create: float = 0.5, max_qubits_create: int = 10, memory_size: int = 10) -> None:
@@ -167,8 +168,7 @@ class Host():
         
         self._flow_table[(bob, fmin, neprs)] = (route, rule)
         
-        
-    
+
 ## Match fica na tabela de fluxo, são as chaves do dicionário.
 ## Request é o que chega, comparado ao match, são diferentes apenas pelo primeiro item. Que no request é o host_id do host que está enviando a requisição.
 ## Route é a rota que o pacote deve seguir.

@@ -1,12 +1,14 @@
+from .time import time
 import random
 import math
 
 class Qubit():
-    def __init__(self, qubit_id: int, initial_fidelity: float = None) -> None:
+    def __init__(self, qubit_id: int, initial_fidelity: float = 1) -> None:
         self.qubit_id = qubit_id
         self._qubit_state = 0  # Define o estado inicial do qubit como 0
-        self._initial_fidelity = initial_fidelity if initial_fidelity is not None else random.uniform(0, 1)
+        self._initial_fidelity = initial_fidelity
         self._current_fidelity = self._initial_fidelity
+        self.t2_time = 100  # Tempo de decoerência T2
 
     def __str__(self):
         return f"Qubit {self.qubit_id} with state {self._qubit_state}"
@@ -18,7 +20,14 @@ class Qubit():
         return self._initial_fidelity
 
     def get_current_fidelity(self):
-        return self._current_fidelity
+        timeslot = time.get_current_time()
+        if self._initial_fidelity < 0 or self._initial_fidelity > 1:
+            raise ValueError("Initial fidelity must be between 0 and 1.")
+        if timeslot < 0:
+            raise ValueError("Time-slot must be non-negative.")
+        # Fidelity decay formula
+        fidelity = self._initial_fidelity * math.exp(-timeslot / self.t2_time)
+        return fidelity    
 
     def set_current_fidelity(self, new_fidelity: float):
             """Define a fidelidade atual do qubit."""

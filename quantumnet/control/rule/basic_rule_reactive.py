@@ -54,10 +54,3 @@ class BasicRuleReactive(Rule):
             remaining_route = [remaining_route[i] for i in range(0, len(remaining_route), 2)]
             current_time += 1
     
-    def run(self):
-        """Executa as ações no tempo certo."""
-        for time in sorted(self.actions.keys()):
-            print(f"Passo: {time}")
-            for action in self.actions[time]:
-                print(f"    Ação: {action}")
-                action.run()

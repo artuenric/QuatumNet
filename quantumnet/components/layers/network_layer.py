@@ -49,7 +49,6 @@ class NetworkLayer:
         returns:
             bool: True se o swapping foi bem-sucedido, False caso contrário.
         """
-        self._network.timeslot()
         eprs_alice_mid = self._network.get_eprs_from_edge(alice, mid)
         eprs_mid_bob = self._network.get_eprs_from_edge(mid, bob)   
         

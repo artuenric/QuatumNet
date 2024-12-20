@@ -108,3 +108,23 @@ class Controller():
         """
         rule.run()
     
+    def avg_route_fidelity(self, route, timeslot):
+        """
+        Calcula a fidelidade média de uma rota.
+
+        Args:
+            route (list): Lista com a rota para o destino.
+            timeslot (int): Timeslot atual.
+            
+        Returns:
+            float : Fidelidade média da rota.
+        """
+       
+        total_fidelity = 0
+        for a, b in zip(route[:-1], route[1:]):
+            epr = self.network.get_eprs_from_edge(a, b)[0]
+            fidelities = epr.get_current_fidelities(timeslot)
+            avg_fidelity = sum(fidelities) / len(fidelities) if fidelities else 0
+            total_fidelity += avg_fidelity
+        
+        return total_fidelity / (len(route) - 1) if len(route) > 1 else 0

@@ -6,7 +6,7 @@ class BasicRuleProactive(Rule):
         super().__init__("BasicRuleProactive")  
         self.controller = controller
         self.route = route
-        self.behavior() 
+        self.behavior()
     
     def behavior(self):
         """Define as ações necessárias para a rota."""
@@ -53,10 +53,3 @@ class BasicRuleProactive(Rule):
             remaining_route = [remaining_route[i] for i in range(0, len(remaining_route), 2)]
             current_time += 1
     
-    def run(self):
-        """Executa as ações no tempo certo."""
-        for time in sorted(self.actions.keys()):
-            print(f"Tempo: {time}")
-            for action in self.actions[time]:
-                print(f"Executando ação: {action}")
-                action.run()
