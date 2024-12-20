@@ -181,7 +181,8 @@ class LinkLayer:
             self._physical_layer.failed_eprs.remove(eprs_fail1)
             self._physical_layer.failed_eprs.remove(eprs_fail2)
             self.logger.log(f'Timeslot {self._network.get_timeslot()}: Purificação falhou no canal ({alice_id}, {bob_id}) devido a baixa probabilidade de sucesso da purificação.')
-            return False
+            return False 
+        
         
     def avg_fidelity_on_linklayer(self):
         """
