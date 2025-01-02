@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
  
 class Rule(ABC):
-    def __init__(self, rule_name, ttl = 10):
+    def __init__(self, rule_name, ttl):
         self.rule_name = rule_name
         self.actions = {}
         self.route = []

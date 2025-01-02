@@ -10,6 +10,7 @@ class Controller():
         self.links = None
         self.conditions_table = None
         self.set_conditions_table(ReactiveTable())
+        self.default_ttl = 10
     
     def calculate_route(self, source, target):
         """

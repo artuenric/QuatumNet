@@ -3,7 +3,7 @@ from ..action import CreateEPRAction
 
 class HighFidelityRule(Rule):
     def __init__(self, route, controller):
-        super().__init__("HighFidelityRoule")
+        super().__init__("HighFidelityRoule", controller.default_ttl)
         self.controller = controller
         
     def behavior(self):

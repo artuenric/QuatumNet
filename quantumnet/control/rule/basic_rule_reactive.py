@@ -3,7 +3,7 @@ from ..action import CreateEPRAction, SwapAction
 
 class BasicRuleReactive(Rule):
     def __init__(self, route, controller):
-        super().__init__("BasicRule")  
+        super().__init__("BasicRule", controller.default_ttl)  
         self.controller = controller
         self.route = route
         self.behavior() 
