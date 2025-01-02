@@ -20,4 +20,4 @@ class CreateEPRAction(Action):
         """
         Cria um par EPR entre dois nós.
         """
-        self.controller.network.physicallayer.echp_on_demand(self.alice, self.bob)
+        self.controller.network.physicallayer.entanglement_creation_heralding_protocol(self.alice, self.bob)
