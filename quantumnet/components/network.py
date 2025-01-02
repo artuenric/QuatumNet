@@ -17,7 +17,6 @@ class Network():
         self._hosts = {}
         self.n_initial_qubits = 10
         self.n_initial_eprs = 10
-        self.registry_of_use = { 'qubits': 0, 'eprs': 0}
         # Camadas
         self._physical = PhysicalLayer(self)
         self._link = LinkLayer(self)
@@ -27,6 +26,11 @@ class Network():
         # Sobre a execução
         self.logger = Logger.get_instance()
         self.count_qubit = 0
+        self.registry_of_resources = {'qubits created': 0,
+                                      'qubits used': 0,
+                                      'eprs created': 0,
+                                      'eprs used': 0,
+                                      }
         #minimo e maximo
         self.max_prob = 1
         self.min_prob = 0.2
@@ -281,7 +285,6 @@ class Network():
             self._graph.edges[edge]['prob_on_demand_epr_create'] = random.uniform(self.min_prob, self.max_prob)
             self._graph.edges[edge]['prob_replay_epr_create'] = random.uniform(self.min_prob, self.max_prob)
             self._graph.edges[edge]['eprs'] = list()
-        print("Canais inicializados")
     
     def refresh_resources(self, num_qubits: int, num_eprs: int):
         """
