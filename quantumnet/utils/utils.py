@@ -28,8 +28,20 @@ def generate_random_request(num_hosts, fmin_range=(0.5, 1.0), eprs_range=(1, 10)
 
     return Request(alice_id, bob_id, fmin, neprs)
 
+def clear_file(filename):
+    """
+    Limpa o conteúdo de um arquivo CSV.
+
+    Args:
+        filename (str): Nome do arquivo CSV.
+    """
+    # Apaga o conteúdo do arquivo CSV
+    with open(filename, mode='w', newline='', encoding='utf-8') as file:
+        pass  # Não escreve nada, só abre e fecha o arquivo
+
+
 # Função para registrar os dados no CSV
-def register_request(request, estado_registro, filename="requests_data.csv"):
+def register_request(request, estado_registro, filename):
     """
     Registra as informações da request no CSV.
     
@@ -46,7 +58,35 @@ def register_request(request, estado_registro, filename="requests_data.csv"):
         
         # Se o arquivo não existe, adiciona o cabeçalho
         if not file_exists:
-            writer.writerow(["ID", "Alice", "Bob", "Fidelidade Mínima", "Número de EPRs", "Início", "Término", "Novo Registro"])
+            writer.writerow(["ID", "Alice", "Bob", "Fidelidade Minima", "Numero de EPRs", "Inicio", "Termino", "Novo Registro"])
         
         # Escreve os dados da request
         writer.writerow([str(request), request.alice, request.bob, request.fmin, request.neprs, request.starttime, request.endtime, estado_registro])
+
+# Função para registrar o consumo de recursos
+def register_consumption(time_slot, registry_of_resources, nome_arquivo):
+    """
+    Registra o número de qubits e pares EPR criados em um determinado time-slot em um arquivo CSV.
+
+    Parâmetros:
+    - time_slot (int): Time-slot atual.
+    - registry_of_resources (dict): Dicionário com os recursos consumidos.
+    - nome_arquivo (str): Nome do arquivo CSV de saída.
+    """
+    # Verifica se o arquivo já existe (cabeçalho só na primeira vez)
+    try:
+        with open(nome_arquivo, 'x', newline='') as arquivo_csv:
+            escritor = csv.writer(arquivo_csv)
+            escritor.writerow(['Time-Slot', 'Qubits Criados', 'Pares EPR Criados'])
+    except FileExistsError:
+        pass  # O arquivo já existe, não precisa reescrever o cabeçalho
+    
+    qubits_criados = registry_of_resources['qubits created']
+    eprs_criados = registry_of_resources['eprs created']
+    
+    # Escreve os dados do time-slot atual
+    with open(nome_arquivo, 'a', newline='') as arquivo_csv:
+        escritor = csv.writer(arquivo_csv)
+        escritor.writerow([time_slot, qubits_criados, eprs_criados])
+
+    print(f"Time-slot {time_slot} registrado: Qubits = {qubits_criados}, EPRs = {eprs_criados}")
