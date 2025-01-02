@@ -4,7 +4,7 @@ from quantumnet.objects import Logger, Epr
 from random import uniform
 
 class LinkLayer:
-    def __init__(self, network, physical_layer):
+    def __init__(self, network):
         """
         Inicializa a camada de enlace.
         
@@ -13,7 +13,6 @@ class LinkLayer:
             physical_layer : PhysicalLayer : Camada física.
         """
         self._network = network
-        self._physical_layer = physical_layer
         self._requests = []
         self._failed_requests = []
         self.logger = Logger.get_instance()
@@ -64,7 +63,7 @@ class LinkLayer:
             self._network.timeslot()
             self.logger.log(f'Timeslot {self._network.get_timeslot()}: Tentativa de emaranhamento entre {alice_id} e {bob_id}.')
 
-            entangle = self._physical_layer.entanglement_creation_heralding_protocol(alice, bob)
+            entangle = self.self._network.physicallayer.entanglement_creation_heralding_protocol(alice, bob)
 
             # Após cada tentativa de emaranhamento, transferimos os EPRs criados para a camada de enlace
             if entangle:
@@ -73,9 +72,9 @@ class LinkLayer:
                 self._requests.append((alice_id, bob_id))
 
                 # Adiciona os EPRs criados pela camada física à lista de EPRs criados da camada de enlace
-                if self._physical_layer.created_eprs:
-                    self.created_eprs.extend(self._physical_layer.created_eprs)
-                    self._physical_layer.created_eprs.clear()  # Limpa a lista da camada física
+                if self.self._network.physicallayer.created_eprs:
+                    self.created_eprs.extend(self.self._network.physicallayer.created_eprs)
+                    self.self._network.physicallayer.created_eprs.clear()  # Limpa a lista da camada física
                 
                 self.logger.log(f'Timeslot {self._network.get_timeslot()}: Entrelaçamento criado entre {alice} e {bob} na tentativa {attempt}.')
                 return True
@@ -88,16 +87,16 @@ class LinkLayer:
             purification_success = self.purification(alice_id, bob_id)
             
             # Independente de a purificação ser bem-sucedida ou não, sempre transferimos os EPRs criados
-            if self._physical_layer.created_eprs:
-                self.created_eprs.extend(self._physical_layer.created_eprs)
-                self._physical_layer.created_eprs.clear()  # Limpa a lista da camada física
+            if self.self._network.physicallayer.created_eprs:
+                self.created_eprs.extend(self.self._network.physicallayer.created_eprs)
+                self.self._network.physicallayer.created_eprs.clear()  # Limpa a lista da camada física
             
             return purification_success
 
         # Após a segunda tentativa, garante que todos os EPRs criados sejam transferidos
-        if self._physical_layer.created_eprs:
-            self.created_eprs.extend(self._physical_layer.created_eprs)
-            self._physical_layer.created_eprs.clear()  # Limpa a lista da camada física
+        if self.self._network.physicallayer.created_eprs:
+            self.created_eprs.extend(self.self._network.physicallayer.created_eprs)
+            self.self._network.physicallayer.created_eprs.clear()  # Limpa a lista da camada física
             
         return False
 
@@ -144,7 +143,7 @@ class LinkLayer:
         """
         self._network.timeslot()  # Incrementa o timeslot para a tentativa de purificação
 
-        eprs_fail = self._physical_layer.failed_eprs
+        eprs_fail = self.self._network.physicallayer.failed_eprs
 
         if len(eprs_fail) < 2:
             self.logger.log(f'Timeslot {self._network.get_timeslot()}: Não há EPRs suficientes para purificação no canal ({alice_id}, {bob_id}).')
@@ -166,20 +165,20 @@ class LinkLayer:
 
             if new_fidelity > 0.8:  # Verifica se a nova fidelidade é maior que 0.8
                 epr_purified = Epr((alice_id, bob_id), new_fidelity)
-                self._physical_layer.add_epr_to_channel(epr_purified, (alice_id, bob_id))
-                self._physical_layer.failed_eprs.remove(eprs_fail1)
-                self._physical_layer.failed_eprs.remove(eprs_fail2)
+                self.self._network.physicallayer.add_epr_to_channel(epr_purified, (alice_id, bob_id))
+                self.self._network.physicallayer.failed_eprs.remove(eprs_fail1)
+                self.self._network.physicallayer.failed_eprs.remove(eprs_fail2)
                 self.logger.log(f'EPRS Usados {self.used_eprs}')
                 self.logger.log(f'Timeslot {self._network.get_timeslot()}: Purificação bem sucedida no canal ({alice_id}, {bob_id}) com nova fidelidade {new_fidelity}.')
                 return True
             else:
-                self._physical_layer.failed_eprs.remove(eprs_fail1)
-                self._physical_layer.failed_eprs.remove(eprs_fail2)
+                self.self._network.physicallayer.failed_eprs.remove(eprs_fail1)
+                self.self._network.physicallayer.failed_eprs.remove(eprs_fail2)
                 self.logger.log(f'Timeslot {self._network.get_timeslot()}: Purificação falhou no canal ({alice_id}, {bob_id}) devido a baixa fidelidade após purificação.')
                 return False
         else:
-            self._physical_layer.failed_eprs.remove(eprs_fail1)
-            self._physical_layer.failed_eprs.remove(eprs_fail2)
+            self.self._network.physicallayer.failed_eprs.remove(eprs_fail1)
+            self.self._network.physicallayer.failed_eprs.remove(eprs_fail2)
             self.logger.log(f'Timeslot {self._network.get_timeslot()}: Purificação falhou no canal ({alice_id}, {bob_id}) devido a baixa probabilidade de sucesso da purificação.')
             return False 
         

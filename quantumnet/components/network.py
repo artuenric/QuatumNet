@@ -17,10 +17,11 @@ class Network():
         self._hosts = {}
         self.n_initial_qubits = 10
         self.n_initial_eprs = 10
+        self.registry_of_use = { 'qubits': 0, 'eprs': 0}
         # Camadas
         self._physical = PhysicalLayer(self)
-        self._link = LinkLayer(self, self._physical)
-        self._network = NetworkLayer(self, self._link, self._physical)
+        self._link = LinkLayer(self)
+        self._network = NetworkLayer(self)
         self._transport = TransportLayer(self, self._network, self._link, self._physical)
         self._application = ApplicationLayer(self, self._transport, self._network, self._link, self._physical)
         # Sobre a execução
@@ -74,7 +75,7 @@ class Network():
     
     # Camadas
     @property
-    def physical(self):
+    def physicallayer(self):
         """
         Camada física da rede.
 
@@ -114,7 +115,7 @@ class Network():
         return self._transport
     
     @property
-    def application_layer(self):
+    def applicationlayer(self):
         """
         Camada de transporte de aplicação.
 
@@ -240,21 +241,33 @@ class Network():
         for node in self._graph.nodes():
             self._hosts[node] = Host(node)
         # Adiciona recursos aos hosts
-        self.start_hosts(self.n_initial_qubits)
+        self.supply_hosts(self.n_initial_qubits)
         self.start_channels()
-        self.start_eprs(self.n_initial_eprs)
+        self.supply_channels(self.n_initial_eprs)
     
-    def start_hosts(self, num_qubits: int):
+    def supply_hosts(self, num_qubits: int):
         """
-        Inicializa os hosts da rede.
+        Abastece os hosts com qubits.
         
         Args:
             num_qubits (int): Número de qubits a serem inicializados.
         """
         for host_id in self._hosts:
             for i in range(num_qubits):
-                self.physical.create_qubit(host_id, increment_timeslot=False,increment_qubits=False)
-        print("Hosts inicializados")    
+                self.physicallayer.create_qubit(host_id, increment_timeslot=False,increment_qubits=False)
+
+    def supply_channels(self, num_eprs: int):
+        """
+        Abastece os canais com pares EPR.
+
+        Args:
+            num_eprs (int): Número de pares EPR a serem inicializados para cada canal.
+        """
+        for edge in self.edges:
+            for i in range(num_eprs):
+                epr = self.physicallayer.create_epr_pair(increment_timeslot=False,increment_eprs=False)
+                self._graph.edges[edge]['eprs'].append(epr)
+                self.logger.debug(f'Par EPR {epr} adicionado ao canal.')
 
     def start_channels(self):
         """
@@ -269,21 +282,18 @@ class Network():
             self._graph.edges[edge]['prob_replay_epr_create'] = random.uniform(self.min_prob, self.max_prob)
             self._graph.edges[edge]['eprs'] = list()
         print("Canais inicializados")
-        
-    def start_eprs(self, num_eprs: int):
+    
+    def refresh_resources(self, num_qubits: int, num_eprs: int):
         """
-        Inicializa os pares EPRs nas arestas da rede.
+        Atualiza os recursos da rede.
 
         Args:
+            num_qubits (int): Número de qubits a serem inicializados.
             num_eprs (int): Número de pares EPR a serem inicializados para cada canal.
         """
-        for edge in self.edges:
-            for i in range(num_eprs):
-                epr = self.physical.create_epr_pair(increment_timeslot=False,increment_eprs=False)
-                self._graph.edges[edge]['eprs'].append(epr)
-                self.logger.debug(f'Par EPR {epr} adicionado ao canal.')
-        print("Pares EPRs adicionados")
-     
+        self.supply_hosts(num_qubits)
+        self.supply_channels(num_eprs)
+          
     def timeslot(self):
         """
         Incrementa o timeslot da rede.

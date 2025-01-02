@@ -4,18 +4,14 @@ from quantumnet.objects import Logger, Epr
 from random import uniform
 
 class NetworkLayer:
-    def __init__(self, network, link_layer, physical_layer):
+    def __init__(self, network):
         """
         Inicializa a camada de rede.
         
         args:
             network : Network : Rede.
-            link_layer : Layer : Camada de enlace.
-            physical_layer : PhysicalLayer : Camada física.
         """
         self._network = network
-        self._physical_layer = physical_layer
-        self._link_layer = link_layer
         self.logger = Logger.get_instance()
         self.avg_size_routes = 0  # Inicializa o tamanho médio das rotas
         self.used_eprs = 0  # Inicializa o contador de EPRs utilizados
@@ -61,8 +57,8 @@ class NetworkLayer:
         epr2 = eprs_mid_bob[0]
                     
         # Remove os pares EPR dos canais
-        self._network.physical.remove_epr_from_channel(epr1, (alice, mid))
-        self._network.physical.remove_epr_from_channel(epr2, (mid, bob))
+        self._network.physicallayer.remove_epr_from_channel(epr1, (alice, mid))
+        self._network.physicallayer.remove_epr_from_channel(epr2, (mid, bob))
         
         # Mede a fidelidade dos pares EPR
         fidelity1 = epr1.get_current_fidelity()
@@ -80,7 +76,7 @@ class NetworkLayer:
             self._network.graph.add_edge(alice, bob, eprs=[], virtual_link=True)
 
         # Adiciona o par EPR virtual ao canal entre node1 e node3
-        self._network.physical.add_epr_to_channel(virtual_epr, (alice, bob))
+        self._network.physicallayer.add_epr_to_channel(virtual_epr, (alice, bob))
 
         # Atualiza o contador de EPRs utilizados
         self.used_eprs += 1
