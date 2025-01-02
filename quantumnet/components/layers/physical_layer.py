@@ -1,4 +1,4 @@
-from ...objects import Logger, Qubit, Epr
+from ...objects import Logger, Qubit, Epr, time
 from ...components import Host
 from random import uniform
 import random
@@ -100,6 +100,9 @@ class PhysicalLayer:
 
         self._count_qubit += 1
         self.logger.debug(f'Qubit {qubit_id} criado com fidelidade inicial {qubit.get_initial_fidelity()} e adicionado à memória do Host {host_id}.')
+        
+        # Inscreve o qubit no time_slot
+        time.subscribe_qubit(qubit)
 
     def create_epr_pair(self, fidelity: float = 1.0, increment_timeslot: bool = True, increment_eprs: bool = True):
         """Cria um par de qubits entrelaçados.
@@ -122,6 +125,9 @@ class PhysicalLayer:
         
         self.logger.debug(f'Par EPR {epr} criado com fidelidade {fidelity}.')
 
+        # Inscreve o par EPR no time_slot
+        time.subscribe_epr(epr)
+        
         return epr
 
     def add_epr_to_channel(self, epr: Epr, channel: tuple):

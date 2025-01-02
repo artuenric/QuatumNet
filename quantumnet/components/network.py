@@ -1,5 +1,5 @@
 import networkx as nx
-from ..objects import Logger, Qubit
+from ..objects import Logger, Qubit, time
 from ..components import Host
 from .layers import *
 import random
