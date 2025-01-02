@@ -78,6 +78,10 @@ class PhysicalLayer:
         Raises:
             Exception: Se o host especificado não existir na rede.
         """
+        
+        # Incrementa o número de qubits criados na rede
+        self._network.registry_of_resources['qubits created'] += 1
+        
         if increment_timeslot:
             self._network.timeslot()
 
@@ -103,6 +107,10 @@ class PhysicalLayer:
         Returns:
             Qubit, Qubit: Par de qubits entrelaçados.
         """
+        
+        # Incrementa o número de EPRs criados na rede
+        self._network.registry_of_resources['eprs created'] += 1
+        
         if increment_timeslot:
             self._network.timeslot() 
 
@@ -175,23 +183,31 @@ class PhysicalLayer:
         self.logger.log(f'A fidelidade entre o qubit {fidelity1} e o qubit {fidelity2} é {combined_fidelity}')
         return combined_fidelity
     
-    def entanglement_creation_heralding_protocol(self, alice: Host, bob: Host):
-        """Protocolo de criação de emaranhamento com sinalização.
-
+    def entanglement_creation_heralding_protocol(self, alice_id: int, bob_id: int):
+        """
+        Protocolo de criação de emaranhamento com sinalização.
+        
+        Args:
+            alice_id (int): ID do host Alice.
+            bob_id (int): ID do host Bob.
+        
         Returns:
             bool: True se o protocolo foi bem sucedido, False caso contrário.
         """
-        self._network.timeslot() # Incrementa o timeslot
-        self.used_qubits += 2
+        # Registra os qubits usados na rede
+        self._network.registry_of_resources['qubits used'] += 2
 
+        alice, bob = self._network.get_host(alice_id), self._network.get_host(bob_id)
+        
         qubit1 = alice.get_last_qubit()
         qubit2 = bob.get_last_qubit()
 
+        # Fidelidade leva em consideração a decoerência
         q1 = qubit1.get_current_fidelity()
         q2 = qubit2.get_current_fidelity()
 
         epr_fidelity = q1 * q2
-        self.logger.log(f'Timeslot {self._network.get_timeslot()}: Par epr criado com fidelidade {epr_fidelity}')
+        self.logger.log(f'Par epr criado com fidelidade {epr_fidelity}')
         epr = self.create_epr_pair(epr_fidelity)
 
         # Armazena o EPR criado na lista de EPRs criados
@@ -200,76 +216,5 @@ class PhysicalLayer:
         alice_host_id = alice.host_id
         bob_host_id = bob.host_id
 
-        if epr_fidelity >= 0.8:
-            # Se a fidelidade for adequada, adiciona o EPR ao canal da rede
-            self._network.graph.edges[(alice_host_id, bob_host_id)]['eprs'].append(epr)
-            self.logger.log(f'Timeslot {self._network.get_timeslot()}: O protocolo de criação de emaranhamento foi bem sucedido com a fidelidade necessária.')
-            return True
-        else:
-            # Adiciona o EPR ao canal mesmo com baixa fidelidade
-            self._network.graph.edges[(alice_host_id, bob_host_id)]['eprs'].append(epr)
-            self._failed_eprs.append(epr)
-            self.logger.log(f'Timeslot {self._network.get_timeslot()}: O protocolo de criação de emaranhamento foi bem sucedido, mas com fidelidade baixa.')
-            return False
-
-    def echp_on_demand(self, alice_host_id: int, bob_host_id: int):
-        """Protocolo para a recriação de um entrelaçamento entre os qubits de acordo com a probabilidade de sucesso de demanda do par EPR criado.
-
-        Args: 
-            alice_host_id (int): ID do Host de Alice.
-            bob_host_id (int): ID do Host de Bob.
-            
-        Returns:
-            bool: True se o protocolo foi bem sucedido, False caso contrário.
-        """
-        self._network.timeslot()  # Incrementa o timeslot
-        self.used_qubits += 2
-
-        qubit1 = self._network.hosts[alice_host_id].get_last_qubit()
-        qubit2 = self._network.hosts[bob_host_id].get_last_qubit()
-            
-        fidelity_qubit1 = self.fidelity_measurement_only_one(qubit1)
-        fidelity_qubit2 = self.fidelity_measurement_only_one(qubit2)
-                
-        prob_on_demand_epr_create = self._network.edges[alice_host_id, bob_host_id]['prob_on_demand_epr_create']
-        echp_success_probability = prob_on_demand_epr_create * fidelity_qubit1 * fidelity_qubit2
-            
-        if uniform(0, 1) < echp_success_probability:
-            self.logger.log(f'Timeslot {self._network.get_timeslot()}: Par EPR criado com a fidelidade de {fidelity_qubit1 * fidelity_qubit2}')
-            epr = self.create_epr_pair(fidelity_qubit1 * fidelity_qubit2)
-            self._network.edges[alice_host_id, bob_host_id]['eprs'].append(epr)
-            self.logger.log(f'Timeslot {self._network.get_timeslot()}: A probabilidade de sucesso do ECHP é {echp_success_probability}')
-            return True
-        self.logger.log(f'Timeslot {self._network.get_timeslot()}: A probabilidade de sucesso do ECHP falhou.')
-        return False
-
-    def echp_on_replay(self, alice_host_id: int, bob_host_id: int):
-        """Protocolo para a recriação de um entrelaçamento entre os qubits de que já estavam perdendo suas características.
-
-        Args: 
-            alice_host_id (int): ID do Host de Alice.
-            bob_host_id (int): ID do Host de Bob.
-        
-        Returns:
-            bool: True se o protocolo foi bem sucedido, False caso contrário.
-        """
-        self._network.timeslot()  # Incrementa o timeslot
-        self.used_qubits += 2
-        
-        qubit1 = self._network.hosts[alice_host_id].get_last_qubit()
-        qubit2 = self._network.hosts[bob_host_id].get_last_qubit()
-        
-        fidelity_qubit1 = self.fidelity_measurement_only_one(qubit1)
-        fidelity_qubit2 = self.fidelity_measurement_only_one(qubit2)
-               
-        prob_replay_epr_create = self._network.edges[alice_host_id, bob_host_id]['prob_replay_epr_create']
-        echp_success_probability = prob_replay_epr_create * fidelity_qubit1 * fidelity_qubit2
-        
-        if uniform(0, 1) < echp_success_probability:
-            self.logger.log(f'Timeslot {self._network.get_timeslot()}: Par EPR criado com a fidelidade de {fidelity_qubit1 * fidelity_qubit2}')
-            epr = self.create_epr_pair(fidelity_qubit1 * fidelity_qubit2)
-            self._network.edges[alice_host_id, bob_host_id]['eprs'].append(epr)
-            self.logger.log(f'Timeslot {self._network.get_timeslot()}: A probabilidade de sucesso do ECHP é {echp_success_probability}')
-            return True
-        self.logger.log(f'Timeslot {self._network.get_timeslot()}: A probabilidade de sucesso do ECHP falhou.')
-        return False
+        # Adiciona o EPR ao canal da rede
+        self._network.graph.edges[(alice_host_id, bob_host_id)]['eprs'].append(epr)
