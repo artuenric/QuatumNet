@@ -146,27 +146,28 @@ class Host():
         """
         # Percorre a tabela de fluxo.
         for match in self._flow_table:
-            # Se o segundo item da request (o destino) for igual ao primeiro item do match (o destino).
-            if request.bob == match[0]:
-                # Se o terceiro item da request (a Fmin) for menor ou igual ao segundo item do match (a Fmin).
-                if request.fmin <= match[1]:
-                    # Se o quarto item da request (o número de pares EPR) for maior ou igual ao terceiro item do match (o número de pares EPR).
-                    if request.neprs <= match[2]:
+            bob, frange, neprs = match[0], match[1], match[2]
+            # Se o bob da request for igual ao bob do match.
+            if request.bob == bob:
+                # Se o fmin da request estiver dentro do range de fidelidade do match.
+                if (request.fmin >= frange[0]) and (request.fmin <= frange[1]):
+                    # Se o número de pares EPR da request for menor ou igual ao número de pares EPR do match.
+                    if request.neprs <= neprs:
                         return self._flow_table[match]
         return False
     
-    def add_match_route_rule(self, bob, fmin, neprs, route, rule):
+    def add_match_route_rule(self, bob, frange, neprs, route, rule):
         """
         Adiciona um match, rota e ação à tabela de fluxo.
             Args:
                 bob (int): ID do host de destino.
-                fmin (int): Fidelidade mínima.
+                frange (tuple): Range de fidelidade a ser atendida para a comunicação.
                 neprs (int): Número de pares EPR.
                 route (list): Lista com a rota que a requisição deve seguir.
                 rule (list): Lista com as ações que devem ser executadas.
         """
         
-        self._flow_table[(bob, fmin, neprs)] = (route, rule)
+        self._flow_table[(bob, frange, neprs)] = (route, rule)
         
 
 ## Match fica na tabela de fluxo, são as chaves do dicionário.

@@ -60,6 +60,7 @@ class Controller():
             request (Request): Requisição que contém as informações da comunicação.
         """
         alice, bob, fmin, neprs = request.alice, request.bob, request.fmin, request.neprs
+        frange = (fmin-0.1,fmin+0.1)
         # Obtém as ações que devem ser executadas de acordo com as decisões do controlador.
         rule = self.apply_conditions(request)
         # Calcula a rota para o destino (segundo item da lista) da request.
@@ -67,9 +68,9 @@ class Controller():
         # Qualifica as ações de acordo com as informações da request.
         rule = self.qualify_rule(rule, route)
         # Adiciona a rota e as ações ao host.
-        self.network.get_host(alice).add_match_route_rule(bob, fmin, neprs, route, rule)
+        self.network.get_host(alice).add_match_route_rule(bob, frange, neprs, route, rule)
 
-    def add_match_route_rule_in_host_proactive(self, alice, bob, fmin, neprs):
+    def add_match_route_rule_in_host_proactive(self, alice, bob, frange, neprs):
         """
         Adiciona um match, uma rota e ações ao host. Isso é feito após a decisão do controlador e utilizando o método add_match_actions do host.
         Nesse cenário, o controlador é proativo, ou seja, ele preenche a tabela com base em informações da rede.
@@ -77,7 +78,7 @@ class Controller():
         Args:
             alice (int): ID do host de origem.
             bob (int): ID do host de destino.
-            fmin (float): Fidelidade mínima para a comunicação.
+            frange (tuple): Range de fidelidade para a comunicação.
             neprs (int): Número de EPRs necessários para a comunicação.
         """
         route = self.calculate_route(alice, bob)
@@ -86,7 +87,7 @@ class Controller():
         # Qualifica as ações de acordo com as informações da request.
         rule = self.qualify_rule(rule, route)
         # Adiciona a rota e as ações ao host.
-        self.network.get_host(alice).add_match_route_rule(bob, fmin, neprs, route, rule)
+        self.network.get_host(alice).add_match_route_rule(bob, frange, neprs, route, rule)
 
     def qualify_rule(self, rule, route):
         """

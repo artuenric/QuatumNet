@@ -1,15 +1,20 @@
 from abc import ABC, abstractmethod
  
 class Rule(ABC):
-    def __init__(self, rule_name, ttl = 100):
+    def __init__(self, rule_name, ttl = 10):
         self.rule_name = rule_name
         self.actions = {}
         self.route = []
         self.ttl = ttl
+        self.age = 0
         self.hit_count = 0
         
     def __repr__(self):
         return f"{self.rule_name}"
+    
+    def increment_age(self):
+        """Incrementa a idade da regra."""
+        self.age += 1
     
     def decrement_ttl(self):
         """Decrementa o TTL da regra."""
