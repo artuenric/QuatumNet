@@ -10,11 +10,13 @@ class Network():
     """
     Um objeto para utilizar como rede.
     """
-    def __init__(self) -> None:
+    def __init__(self, n_initial_qubits=10) -> None:
         # Sobre a rede
         self._graph = nx.Graph()
         self._topology = None
         self._hosts = {}
+        self.n_initial_qubits = 10
+        self.n_initial_eprs = 10
         # Camadas
         self._physical = PhysicalLayer(self)
         self._link = LinkLayer(self, self._physical)
@@ -237,11 +239,12 @@ class Network():
         # Cria os hosts e adiciona ao dicionário de hosts
         for node in self._graph.nodes():
             self._hosts[node] = Host(node)
-        self.start_hosts()
+        # Adiciona recursos aos hosts
+        self.start_hosts(self.n_initial_qubits)
         self.start_channels()
-        self.start_eprs()
+        self.start_eprs(self.n_initial_eprs)
     
-    def start_hosts(self, num_qubits: int = 1000):
+    def start_hosts(self, num_qubits: int):
         """
         Inicializa os hosts da rede.
         
@@ -267,7 +270,7 @@ class Network():
             self._graph.edges[edge]['eprs'] = list()
         print("Canais inicializados")
         
-    def start_eprs(self, num_eprs: int = 10):
+    def start_eprs(self, num_eprs: int):
         """
         Inicializa os pares EPRs nas arestas da rede.
 
