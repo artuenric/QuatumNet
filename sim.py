@@ -230,3 +230,84 @@ class RequestsReactiveSimulation(Simulation):
     
     def plot_results(self):
         pass
+    
+class QubitsEprsHibridSimulation(Simulation):
+    def __init__(self, info_network, info_controller, info_request, info_simulation):
+        super().__init__(info_network, info_controller, info_request, info_simulation)
+    
+    def update_time(self, n_time_slots):
+        """
+        Atualiza o tempo e os recursos
+
+        Args:
+            time_for_update (int): Tempo para incrementar o time-slot.
+        """
+        # Atualiza o tempo
+            # Atualiza o tempo
+        for t in range(n_time_slots):
+            time.increment()
+            
+            # Registra o consumo de recursos
+            register_consumption(time.get_current_time(), self.network.registry_of_resources, self.file_path)
+            
+            # Atualiza os recursos de 10 em 10
+            if time.get_current_time() % self.time_to_refill == 0:
+                self.network.refresh_resources(num_qubits=self.n_qubits_to_refill, num_eprs=self.n_eprs_to_refill)
+                print(f"[Time {time.get_current_time()}] Recursos atualizados")
+    
+    def proactive_filling(self):
+        """
+        Preenche as tabelas de fluxo com regras de forma proativa.
+        """
+        hosts = self.network.hosts
+        for alice in hosts:
+            print(f"Adicionando regras para {alice}")
+            for bob in hosts:
+                self.controller.add_match_route_rule_in_host_proactive(alice, bob, (0.5, 0.6), 5)
+                self.controller.add_match_route_rule_in_host_proactive(alice, bob, (0.8, 0.9), 5)
+            # Mostra as tabelas
+            self.network.get_host(alice).draw_flow_table()
+    
+    def process_requests_and_reactive_filling(self):
+        for request in self.requests:
+            print(f"[Time {time.get_current_time()}] Processando requisição {request}...")
+            alice = self.network.get_host(request.alice)
+            rule = alice.find_rule_by_request(request)
+
+            if rule == False:  # Caso não exista um match na tabela
+                request.starttime = time.get_current_time()
+                self.update_time(3)
+                self.controller.add_match_route_rule_in_host_reactive(request)
+                rule = alice.find_rule_by_request(request)
+                self.controller.run_rule(rule[1])
+                request.endtime = time.get_current_time()
+                
+            else:  # Caso já exista a regra
+                request.starttime = time.get_current_time()
+                self.update_time(1)
+                self.controller.run_rule(rule[1])
+                request.endtime = time.get_current_time()
+            
+            # Exibir informações da requisição
+            print(f"Request {request}: Start Time = {request.starttime}, End Time = {request.endtime}")    
+    
+    def run(self):
+        """
+        Executa a simulação.
+        """
+        # Limpa os arquivos de saída
+        clear_file(self.file_path)
+        
+        # Preenche as tabelas de fluxo proativamente
+        self.proactive_filling()
+        
+        # Cria n_requests requisições aleatórias
+        for _ in range(self.n_requests):
+            self.requests.append(generate_random_request(len(self.network.hosts), self.fidelity_requests_range, self.n_eprs_requests_range))
+        
+        # Percorre as requisições e preenche as tabelas de fluxo de forma reativa
+        self.process_requests_and_reactive_filling()
+        
+    
+    def plot_results(self):
+        pass

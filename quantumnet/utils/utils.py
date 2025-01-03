@@ -67,26 +67,59 @@ def register_request(request, estado_registro, filename):
 def register_consumption(time_slot, registry_of_resources, nome_arquivo):
     """
     Registra o número de qubits e pares EPR criados em um determinado time-slot em um arquivo CSV.
+    Sempre inclui o cabeçalho na primeira linha do arquivo.
 
     Parâmetros:
     - time_slot (int): Time-slot atual.
     - registry_of_resources (dict): Dicionário com os recursos consumidos.
     - nome_arquivo (str): Nome do arquivo CSV de saída.
     """
-    # Verifica se o arquivo já existe (cabeçalho só na primeira vez)
-    try:
-        with open(nome_arquivo, 'x', newline='') as arquivo_csv:
-            escritor = csv.writer(arquivo_csv)
-            escritor.writerow(['Time-Slot', 'Qubits Criados', 'Pares EPR Criados'])
-    except FileExistsError:
-        pass  # O arquivo já existe, não precisa reescrever o cabeçalho
-    
     qubits_criados = registry_of_resources['qubits created']
     eprs_criados = registry_of_resources['eprs created']
     
-    # Escreve os dados do time-slot atual
+    # Verifica se o arquivo já existe
+    try:
+        with open(nome_arquivo, 'r') as arquivo_csv:
+            ja_existe = True
+    except FileNotFoundError:
+        ja_existe = False
+
+    # Escreve os dados, adicionando o cabeçalho apenas se necessário
     with open(nome_arquivo, 'a', newline='') as arquivo_csv:
         escritor = csv.writer(arquivo_csv)
+        
+        if not ja_existe:
+            # Escreve o cabeçalho
+            escritor.writerow(['Time-Slot', 'Qubits Criados', 'Pares EPR Criados'])
+        
+        # Escreve os dados do time-slot atual
         escritor.writerow([time_slot, qubits_criados, eprs_criados])
 
     print(f"Time-slot {time_slot} registrado: Qubits = {qubits_criados}, EPRs = {eprs_criados}")
+
+# Função para registrar o número de regras em um time-slot
+def register_time_slot_and_rules(time_slot, num_rules, filename):
+    """
+    Registra o time-slot e o número de regras em um arquivo CSV.
+    
+    Parâmetros:
+        time_slot (int): O time-slot atual.
+        num_rules (int): O número de regras associadas ao time-slot.
+        filename (str): O nome do arquivo CSV de saída.
+    """
+    # Verifica se o arquivo já existe e se está vazio
+    file_exists = os.path.exists(filename)
+    file_empty = file_exists and os.stat(filename).st_size == 0
+    
+    # Abre o arquivo no modo de anexação (append)
+    with open(filename, mode='a', newline='') as file:
+        writer = csv.writer(file)
+        
+        # Se o arquivo não existe ou está vazio, adiciona o cabeçalho
+        if not file_exists or file_empty:
+            writer.writerow(["Time_Slot", "Numero_de_Regras"])  # Colunas com os nomes corretos
+        
+        # Escreve os dados do time-slot
+        writer.writerow([time_slot, num_rules])
+
+    print(f"Time-slot {time_slot} registrado com {num_rules} regras.")

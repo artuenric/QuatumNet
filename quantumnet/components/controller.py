@@ -110,6 +110,17 @@ class Controller():
         """
         rule.run()
     
+    def get_number_of_rules(self):
+        """
+        Retorna o número de regras que devem ser
+        """
+        hosts = self.network.hosts
+        n_rules = 0
+        for host in hosts:
+            n_rules += len(self.network.get_host(host)._flow_table)
+
+        return n_rules
+    
     def avg_route_fidelity(self, route, timeslot):
         """
         Calcula a fidelidade média de uma rota.
