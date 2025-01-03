@@ -1,5 +1,5 @@
 from tabulate import tabulate
-from ..objects import Logger, Qubit
+from ..objects import Logger, Qubit, time
 from math import exp
 
 class Host():
@@ -14,6 +14,7 @@ class Host():
         self._probability_on_demand_qubit_create = probability_on_demand_qubit_create
         self._probability_replay_qubit_create = probability_replay_qubit_create
         self._flow_table = self.start_flow_table()
+        self._rule_index = {}
         # Sobre a execução
         self.logger = Logger.get_instance()
     
@@ -145,7 +146,12 @@ class Host():
             
         """
         # Percorre a tabela de fluxo.
-        for match in self._flow_table:
+        for match in self._flow_table.copy():
+            # Desconsidera e remove regras fechadas
+            rule = self._flow_table[match][1]
+            if not rule.opened:
+                continue
+            # Coleta as informações do match.
             bob, frange, neprs = match[0], match[1], match[2]
             # Se o bob da request for igual ao bob do match.
             if request.bob == bob:
@@ -166,10 +172,41 @@ class Host():
                 route (list): Lista com a rota que a requisição deve seguir.
                 rule (list): Lista com as ações que devem ser executadas.
         """
-        
-        self._flow_table[(bob, frange, neprs)] = (route, rule)
-        
+        # Inscreve a regra no gerenciador de tempo.
+        time.subscribe_rule(rule)
+        # Registra o host na regra.
+        rule.set_host(self)
+        # Adiciona o match, rota e regra à tabela de fluxo.
+        match_flow = (bob, frange, neprs)
+        self._flow_table[match_flow] = (route, rule)
+        # Adiciona o index da regra ao dicionário de índices. Isso facilita a busca de regras na tabela de fluxo.
+        self._rule_index[rule] = match_flow
 
+    def find_match_by_rule(self, rule):
+        """
+        Encontra um match na tabela de fluxo dado uma regra.
+        
+        Args:
+            rule (list): Lista de ações que devem ser executadas.
+        """
+        match_flow = self._rule_index[rule]
+        return match_flow
+    
+    def remove_flow_by_rule(self, rule):
+        """
+        Deleta uma regra da tabela de fluxo.
+        
+        Args:
+            rule (list): Lista de ações que devem ser executadas.
+        """
+        if rule not in self._rule_index:
+            raise Exception('Regra não encontrada na tabela de fluxo.')
+        # Encontra o match na tabela de fluxo.
+        match_flow = self.find_match_by_rule(rule)
+        del self._flow_table[match_flow]
+        del self._rule_index[rule]
+        
+    
 ## Match fica na tabela de fluxo, são as chaves do dicionário.
 ## Request é o que chega, comparado ao match, são diferentes apenas pelo primeiro item. Que no request é o host_id do host que está enviando a requisição.
 ## Route é a rota que o pacote deve seguir.
