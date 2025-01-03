@@ -211,14 +211,18 @@ class Network():
         except IndexError:
             raise Exception('Não há Pares EPRs.')   
         
-    def set_ready_topology(self, topology_name: str, *args: int) -> str:
+    def set_ready_topology(self, topology_name: str, topology_params: tuple) -> str:
         """
         Cria um grafo com uma das topologias prontas para serem utilizadas. 
         São elas: Grade, Linha, Anel. Os nós são numerados de 0 a n-1, onde n é o número de nós.
 
         Args: 
             topology_name (str): Nome da topologia a ser utilizada.
-            **args (int): Argumentos para a topologia. Geralmente, o número de hosts.
+            topology_params (tuple): Parâmetros da topologia a ser utilizada.
+            
+        Exemplo:
+            set_ready_topology('Grade', (2, 2)) cria uma topologia de grade 2x2.
+            set_ready_topology('Linha', (4,)) cria uma topologia de linha com 4 nós.
         
         """
         # Nomeia a topologia da rede
@@ -226,17 +230,17 @@ class Network():
     
         # Cria o grafo da topologia escolhida
         if topology_name == 'Grade':
-            if len(args) != 2:
+            if len(topology_params) != 2:
                 raise Exception('Para a topologia Grade, são necessários dois argumentos.')
-            self._graph = nx.grid_2d_graph(*args)
+            self._graph = nx.grid_2d_graph(topology_params[0], topology_params[1])
         elif topology_name == 'Linha':
-            if len(args) != 1:
+            if len(topology_params) != 1:
                 raise Exception('Para a topologia Linha, é necessário um argumento.')
-            self._graph = nx.path_graph(*args)
+            self._graph = nx.path_graph(topology_params[0])
         elif topology_name == 'Anel':
-            if len(args) != 1:
+            if len(topology_params) != 1:
                 raise Exception('Para a topologia Anel, é necessário um argumento.')
-            self._graph = nx.cycle_graph(*args)
+            self._graph = nx.cycle_graph(topology_params[0])
 
         # Converte os labels dos nós para inteiros
         self._graph = nx.convert_node_labels_to_integers(self._graph)
