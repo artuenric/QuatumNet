@@ -151,7 +151,7 @@ class RequestsHibridSimulation(Simulation):
     def plot_results(self):
         pass
     
-class RequestsReactiveSimulation(Simulation):
+class RequestsProactiveSimulation(Simulation):
     def __init__(self, info_network, info_controller, info_request, info_simulation):
         super().__init__(info_network, info_controller, info_request, info_simulation)
     
@@ -220,6 +220,65 @@ class RequestsReactiveSimulation(Simulation):
         
         # Preenche as tabelas de fluxo proativamente
         self.proactive_filling()
+        
+        # Cria n_requests requisições aleatórias
+        for _ in range(self.n_requests):
+            self.requests.append(generate_random_request(len(self.network.hosts), self.fidelity_requests_range, self.n_eprs_requests_range))
+        
+        # Processa as requisições
+        self.process_requests(self.requests)
+    
+    def plot_results(self):
+        pass
+    
+class RequestsReactiveSimulation(Simulation):
+    def __init__(self, info_network, info_controller, info_request, info_simulation):
+        super().__init__(info_network, info_controller, info_request, info_simulation)
+
+    def update_time(self, n_time_slots):
+        """
+        Atualiza o tempo e as regras
+
+        Args:
+            time_for_update (int): Tempo para incrementar o time-slot.
+        """
+        # Atualiza o tempo
+        for t in range(n_time_slots):
+            time.increment()
+            # Atualiza os recursos de 10 em 10
+            if time.get_current_time() % self.time_to_refill == 0:
+                self.network.refresh_resources(num_qubits=self.n_qubits_to_refill, num_eprs=self.n_eprs_to_refill)
+                print(f"[Time {time.get_current_time()}] Recursos atualizados")
+    
+    def process_requests_and_reactive_filling(self):
+        for request in self.requests:
+            print(f"[Time {time.get_current_time()}] Processando requisição {request}...")
+            alice = self.network.get_host(request.alice)
+            rule = alice.find_rule_by_request(request)
+
+            if rule == False:  # Caso não exista um match na tabela
+                request.starttime = time.get_current_time()
+                self.update_time(3)
+                self.controllercontrolador.add_match_route_rule_in_host_reactive(request)
+                rule = alice.find_rule_by_request(request)
+                self.controller.run_rule(rule[1])
+                request.endtime = time.get_current_time() 
+                # Registra no CSV como um novo registro
+                register_request(request, "Novo_Registro", self.file_path)
+            else:  # Caso já exista a regra
+                request.starttime = time.get_current_time()
+                self.update_time(1)
+                self.controller.run_rule(rule[1])
+                request.endtime = time.get_current_time()
+                # Registra no CSV como já registrado
+                register_request(request, "Ja_Registrado", self.file_path)
+            
+            # Exibir informações da requisição
+            print(f"Request {request}: Start Time = {request.starttime}, End Time = {request.endtime}")
+    
+    def run(self):
+        # Limpa os arquivos de saída
+        clear_file(self.file_path)
         
         # Cria n_requests requisições aleatórias
         for _ in range(self.n_requests):
