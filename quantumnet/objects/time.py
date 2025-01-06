@@ -58,5 +58,12 @@ class TimeManager:
         """Get the current time-slot."""
         return self.current_time
 
+    def reset(self):
+        """Reset the time-slot."""
+        self.current_time = 0
+        self.qubits = []
+        self.eprs = []
+        self.rules = []
+
 # Instância única do gerenciador de tempo
 time = TimeManager()
