@@ -11,8 +11,8 @@ class Request():
         self.starttime = 0
         self.endtime = 0
     
-    def __str__(self):
-        return f"R-{hex(id(self))[-6:].upper()}"
+    def __repr__(self):
+        return f"R{hex(id(self))[-6:].upper()}:{self.alice}-{self.bob}:{self.fmin}:{self.neprs}"
         
     def close(self, endtime):
         """
