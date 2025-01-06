@@ -11,7 +11,9 @@ class Controller():
         self.conditions_table = None
         self.set_conditions_table(ReactiveTable())
         self.default_ttl = 10
-    
+        self.fulfilled_requests = []
+        self.successful_requests = []
+        
     def calculate_route(self, source, target):
         """
         Calcula a rota para o destino.
@@ -109,6 +111,24 @@ class Controller():
             rule (dict): Dicionário com as ações que devem ser executadas.
         """
         rule.run()
+    
+    def fulfill_request(self, request):
+        """
+        Descarta uma requisição.
+
+        Args:
+            request (Request): Requisição a ser descartada.
+        """
+        self.fulfilled_requests.append(request)
+    
+    def successful_request(self, request):      
+        """
+        Marca uma requisição como bem sucedida.
+
+        Args:
+            request (Request): Requisição a ser marcada.
+        """
+        self.successful_requests.append(request)
     
     def avg_route_fidelity(self, route, timeslot):
         """
