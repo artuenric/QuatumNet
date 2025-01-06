@@ -1,5 +1,6 @@
 from random import randint, uniform
 from quantumnet.objects.request import Request
+import csv
 
 def generate_random_request(num_hosts, fmin_range, eprs_range):
     """
@@ -81,3 +82,13 @@ def generate_mixed_traffic(num_hosts, n_requests, burst_probability=0.3, burst_s
         else:
             traffic.append(generate_random_request(num_hosts, fmin_range, eprs_range))
     return traffic
+
+def clear_file(file_path):
+    """
+    Limpa um arquivo CSV, removendo todos os dados.
+
+    Args:
+        file_path (str): Caminho para o arquivo CSV a ser limpo.
+    """
+    with open(file_path, 'w', newline='') as csvfile:
+        csvfile.truncate()
