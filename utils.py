@@ -83,6 +83,40 @@ def generate_mixed_traffic(num_hosts, n_requests, burst_probability=0.3, burst_s
             traffic.append(generate_random_request(num_hosts, fmin_range, eprs_range))
     return traffic
 
+def generate_traffic(request_params):
+    """
+    Gera uma lista de requisições com base no tipo de tráfego especificado.
+
+    Args:
+        requests_params (dict): Dicionário contendo informações sobre o tráfego.
+            - traffic_type (str): Tipo de tráfego a ser gerado ('random', 'burst', 'mixed').
+            - burst_probability (float): Probabilidade de gerar uma rajada (usado apenas para tráfego 'mixed').
+            - burst_size (int): Número de requisições por rajada (usado apenas para tráfego 'burst' e 'mixed').
+            - fmin_range (tuple): Intervalo de fidelidade mínima (mínimo, máximo).
+            - eprs_range (tuple): Intervalo de número de EPRs (mínimo, máximo).
+            - num_hosts (int): Número de hosts na rede.
+            - n_requests (int): Número de requisições a serem geradas.
+
+    Returns:
+        list: Lista de requisições geradas.
+    """
+    num_hosts = request_params.get('num_hosts')
+    n_requests = request_params.get('n_requests')
+    traffic_type = request_params.get('traffic_type')
+    burst_probability = request_params.get('burst_probability', 0.3)
+    burst_size = request_params.get('burst_size', 5)
+    fmin_range = request_params.get('fmin_range', (0.5, 1.0))
+    eprs_range = request_params.get('eprs_range', (1, 10))
+
+    if traffic_type == 'random':
+        return generate_random_traffic(num_hosts, n_requests, fmin_range, eprs_range)
+    elif traffic_type == 'burst':
+        return generate_burst_traffic(num_hosts, burst_size, n_requests // burst_size, fmin_range, eprs_range)
+    elif traffic_type == 'mixed':
+        return generate_mixed_traffic(num_hosts, n_requests, burst_probability, burst_size, fmin_range, eprs_range)
+    else:
+        raise ValueError("Tipo de tráfego inválido. Escolha entre 'random', 'burst' ou 'mixed'.")
+
 def clear_file(file_path):
     """
     Limpa um arquivo CSV, removendo todos os dados.
