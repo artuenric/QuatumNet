@@ -3,20 +3,26 @@ import random
 import math
 
 class Qubit():
-    def __init__(self, qubit_id: int, initial_fidelity: float = 1) -> None:
-        self.qubit_id = qubit_id
-        self._relaxed = False
-        self._qubit_state = 0
+    def __init__(self, host, initial_fidelity: float = 1) -> None:
+        # Sobre as informações do qubit
+        self.host = host
+        self.qubit_id = self.set_id()
         self._creation_time = time.get_current_time()
         self._life_time = 0
+        # Sobre o estado do qubit
+        self._relaxed = False
+        self._qubit_state = 0
         # Sobre a fidelidade
         self._initial_fidelity = initial_fidelity
         self._current_fidelity = self._initial_fidelity
         self.t2_time = 100  # Tempo de decoerência T2
+        
+    def __repr__(self):
+        return self.qubit_id
 
-    def __str__(self):
-        return f"Qubit {self.qubit_id} with state {self._qubit_state}"
-
+    def set_id(self):
+        return f"Q{hex(id(self))[-4:].upper()}.{self.host.count_qubit}"
+    
     def update_fidelity(self):
         self._current_fidelity = random.uniform(0, 1)
 

@@ -3,14 +3,14 @@ from ..objects import Logger, Qubit, time
 from math import exp
 
 class Host():
-    def __init__(self, host_id: int, probability_on_demand_qubit_create: float = 0.5, probability_replay_qubit_create: float = 0.5, max_qubits_create: int = 10, memory_size: int = 10) -> None:
+    def __init__(self, host_id: int, probability_on_demand_qubit_create: float = 0.5, probability_replay_qubit_create: float = 0.5, memory_size: int = 10) -> None:
         # Sobre a rede
         self._host_id = host_id
         self._connections = []
         # Sobre o host
         self._memory = []
+        self._count_qubit = 0
         self._memory_size = memory_size
-        self._max_qubits_create = max_qubits_create
         self._probability_on_demand_qubit_create = probability_on_demand_qubit_create
         self._probability_replay_qubit_create = probability_replay_qubit_create
         self._flow_table = self.start_flow_table()
@@ -50,6 +50,16 @@ class Host():
             list : Lista de qubits.
         """
         return self._memory
+    
+    @property
+    def count_qubit(self):
+        """
+        Retorna a quantidade de qubits na memória.
+
+        Returns:
+            int : Quantidade de qubits.
+        """
+        return self._count_qubit
     
     @property
     def flow_table(self):
@@ -106,6 +116,7 @@ class Host():
             qubit (Qubit): O qubit a ser adicionado.
         """
         
+        self._count_qubit += 1
         self.memory.append(qubit)
         Logger.get_instance().debug(f'Qubit {qubit.qubit_id} adicionado à memória do Host {self.host_id}.')
 
