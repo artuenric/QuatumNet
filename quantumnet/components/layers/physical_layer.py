@@ -187,13 +187,16 @@ class PhysicalLayer:
         qubit1 = alice.get_last_qubit()
         qubit2 = bob.get_last_qubit()
 
-        # Fidelidade leva em consideração a decoerência
-        q1 = qubit1.get_current_fidelity()
-        q2 = qubit2.get_current_fidelity()
+        if not qubit1 or not qubit2:
+            print("Não há qubits suficientes para criar o par EPR.")
+        else:
+            # Fidelidade leva em consideração a decoerência
+            q1 = qubit1.get_current_fidelity()
+            q2 = qubit2.get_current_fidelity()
 
-        epr_fidelity = q1 * q2
-        self.logger.log(f'Par epr criado com fidelidade {epr_fidelity}')
-        epr = self.create_epr_pair((alice_id, bob_id), epr_fidelity)
+            epr_fidelity = q1 * q2
+            self.logger.log(f'Par epr criado com fidelidade {epr_fidelity}')
+            epr = self.create_epr_pair((alice_id, bob_id), epr_fidelity)
 
-        # Adiciona o EPR ao canal da rede
-        self.add_epr_to_channel(epr, (alice_id, bob_id))
+            # Adiciona o EPR ao canal da rede
+            self.add_epr_to_channel(epr, (alice_id, bob_id))

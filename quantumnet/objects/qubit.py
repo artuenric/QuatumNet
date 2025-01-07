@@ -49,9 +49,13 @@ class Qubit():
 
     def relax(self):
         """Relaxa o qubit, zerando a fidelidade."""
+        # A fidelidade do qubit é zerada
         self._current_fidelity = 0
+        # O qubit é relaxado
         self._relaxed = True
+        # O qubit é removido da memória do host
         self.host.remove_qubit(self)
+        # O qubit é removido do gerenciador de tempo
         time.qubits.remove(self)
         
     def update_time(self):
