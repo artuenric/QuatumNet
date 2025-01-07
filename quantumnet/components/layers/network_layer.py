@@ -69,7 +69,7 @@ class NetworkLayer:
         
         # Calcula a nova fidelidade do par EPR virtual
         new_fidelity = (fidelity1 * fidelity2) / ((fidelity1 * fidelity2) + (1 - fidelity1) * (1 - fidelity2))
-        virtual_epr = Epr((alice, bob), new_fidelity)
+        virtual_epr = self._network.physicallayer.create_epr_pair((alice, bob), new_fidelity)
 
         # Se o canal entre node1 e node3 não existir, adiciona um novo canal
         if not self._network.graph.has_edge(alice, bob):

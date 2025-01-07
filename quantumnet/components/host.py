@@ -88,8 +88,10 @@ class Host():
             Qubit : Último qubit da memória.
         """
         try:
+            # Remove o último qubit da memória e do time.
             q = self.memory[-1]
             self.memory.remove(q)
+            time.qubits.remove(q)
             return q
         except IndexError:
             raise Exception('Não há mais qubits na memória.')
@@ -120,6 +122,17 @@ class Host():
         self.memory.append(qubit)
         Logger.get_instance().debug(f'Qubit {qubit.qubit_id} adicionado à memória do Host {self.host_id}.')
 
+    def remove_qubit(self, qubit: Qubit):
+        """
+        Remove um qubit da memória do host.
+
+        Args:
+            qubit (Qubit): O qubit a ser removido.
+        """
+        print(qubit)
+        self.memory.remove(qubit)
+        Logger.get_instance().debug(f'Qubit {qubit.qubit_id} removido da memória do Host {self.host_id}.')
+    
     def info(self):
         """
         Retorna informações sobre o host.

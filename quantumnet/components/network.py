@@ -197,20 +197,16 @@ class Network():
         edge = (alice, bob)
         return self._graph.edges[edge]['eprs']
     
-    def remove_epr(self, alice: int, bob: int) -> list:
+    def remove_epr(self, channel, epr):
         """
         Remove um EPR de um canal.
 
         Args:
             channel (tuple): Canal de comunicação.
+            epr (Epr): EPR a ser removido.
         """
-        channel = (alice, bob)
-        try:
-            epr = self._graph.edges[channel]['eprs'].pop(-1)   
-            return epr
-        except IndexError:
-            raise Exception('Não há Pares EPRs.')   
-        
+        self._graph.edges[channel]['eprs'].remove(epr)
+    
     def set_ready_topology(self, topology_name: str, topology_params: tuple) -> str:
         """
         Cria um grafo com uma das topologias prontas para serem utilizadas. 
@@ -273,8 +269,8 @@ class Network():
         """
         for edge in self.edges:
             for i in range(num_eprs):
-                epr = self.physicallayer.create_epr_pair(increment_timeslot=False,increment_eprs=False)
-                self._graph.edges[edge]['eprs'].append(epr)
+                epr = self.physicallayer.create_epr_pair(edge)
+                self.physicallayer.add_epr_to_channel(epr, edge)
                 self.logger.debug(f'Par EPR {epr} adicionado ao canal.')
 
     def start_channels(self):

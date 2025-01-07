@@ -35,12 +35,12 @@ class TimeManager:
     def notify_qubits(self):
         """Notifica aos qubits a passsagem de tempo."""
         for qubit in self.qubits:
-            qubit.update_time(self.current_time)
+            qubit.update_time()
     
     def notify_eprs(self):
         """Notifica aos pares EPR a passagem de tempo."""
         for epr in self.eprs:
-            epr.update_time(self.current_time)
+            epr.update_time()
     
     def notify_rules(self):
         """Notifica as regras a passagem de tempo."""

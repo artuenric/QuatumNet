@@ -175,7 +175,7 @@ class TransportLayer:
         
         # Par virtual é deletado no final
         for i in range(len(route) - 1):
-            self._network.remove_epr(route[i], route[i + 1])
+            self._network.edges[(route[i], route[i + 1])]['eprs'].pop(-1)
         
         self.transmitted_qubits.append(qubit_info)
         return True

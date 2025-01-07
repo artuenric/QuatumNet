@@ -15,7 +15,7 @@ class Qubit():
         # Sobre a fidelidade
         self._initial_fidelity = initial_fidelity
         self._current_fidelity = self._initial_fidelity
-        self.t2_time = 100  # Tempo de decoerência T2
+        self.t2_time = 10  # Tempo de decoerência T2
         
     def __repr__(self):
         return self.qubit_id
@@ -51,12 +51,14 @@ class Qubit():
         """Relaxa o qubit, zerando a fidelidade."""
         self._current_fidelity = 0
         self._relaxed = True
+        self.host.remove_qubit(self)
+        time.qubits.remove(self)
         
-    def update_time(self, current_time):
+    def update_time(self):
         """Atualiza a fidelidade do qubit de acordo com o tempo."""
         # Atualiza o tempo de vida do qubit
         self._life_time += 1
         # Se a fidelidade atual for menor que 0.2, relaxa o qubit
-        if self.get_current_fidelity() < 0.2:
+        if self.get_current_fidelity() < 0.4:
             self.relax()
         # self._current_fidelity = self.get_current_fidelity()

@@ -88,7 +88,7 @@ class PhysicalLayer:
         # Inscreve o qubit no time_slot
         time.subscribe_qubit(qubit)
 
-    def create_epr_pair(self, fidelity: float = 1.0, increment_timeslot: bool = True, increment_eprs: bool = True):
+    def create_epr_pair(self, channel, fidelity: float = 1.0):
         """Cria um par de qubits entrelaçados.
 
         Returns:
@@ -98,19 +98,10 @@ class PhysicalLayer:
         # Incrementa o número de EPRs criados na rede
         self._network.registry_of_resources['eprs created'] += 1
         
-        if increment_timeslot:
-            self._network.timeslot() 
-
-        if increment_eprs:
-            self.used_eprs += 1
-            
-        epr = Epr(self._count_epr, fidelity)
-        self._count_epr += 1
+        # Cria o par EPR
+        epr = Epr(self._network, channel, fidelity)
         
         self.logger.debug(f'Par EPR {epr} criado com fidelidade {fidelity}.')
-
-        # Inscreve o par EPR no time_slot
-        time.subscribe_epr(epr)
         
         return epr
 
@@ -126,9 +117,13 @@ class PhysicalLayer:
             self._network.graph.add_edge(u, v, eprs=[])
         self._network.graph.edges[u, v]['eprs'].append(epr)
         self.logger.debug(f'Par EPR {epr} adicionado ao canal {channel}.')
+        
+        # Inscreve o par EPR no time_slot
+        time.subscribe_epr(epr)
 
     def remove_epr_from_channel(self, epr: Epr, channel: tuple):
-        """Remove um par EPR do canal.
+        """
+        Remove um par EPR do canal.
 
         Args:
             epr (Epr): Par EPR a ser removido.
@@ -137,9 +132,9 @@ class PhysicalLayer:
         u, v = channel
         if not self._network.graph.has_edge(u, v):
             self.logger.debug(f'Canal {channel} não existe.')
-            return
         try:
             self._network.graph.edges[u, v]['eprs'].remove(epr)
+            time.eprs.remove(epr)
             self.logger.debug(f'Par EPR {epr} removido do canal {channel}.')
         except ValueError:
             self.logger.debug(f'Par EPR {epr} não encontrado no canal {channel}.')
@@ -198,13 +193,7 @@ class PhysicalLayer:
 
         epr_fidelity = q1 * q2
         self.logger.log(f'Par epr criado com fidelidade {epr_fidelity}')
-        epr = self.create_epr_pair(epr_fidelity)
-
-        # Armazena o EPR criado na lista de EPRs criados
-        self.created_eprs.append(epr)
-
-        alice_host_id = alice.host_id
-        bob_host_id = bob.host_id
+        epr = self.create_epr_pair((alice_id, bob_id), epr_fidelity)
 
         # Adiciona o EPR ao canal da rede
-        self._network.graph.edges[(alice_host_id, bob_host_id)]['eprs'].append(epr)
+        self.add_epr_to_channel(epr, (alice_id, bob_id))
