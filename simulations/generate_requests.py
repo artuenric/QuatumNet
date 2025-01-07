@@ -54,9 +54,13 @@ def generate_burst_traffic(num_hosts, requests_per_burst, n_bursts, fmin_range=(
         list: Lista de requisições geradas.
     """
     bursts = []
+    import copy
     for _ in range(n_bursts):
-        burst_request = generate_random_request(num_hosts, fmin_range, eprs_range)
-        bursts.extend([burst_request] * requests_per_burst)
+        # Gera UMA requisição base por rajada
+        base_request = generate_random_request(num_hosts, fmin_range, eprs_range)
+        
+        # Cria cópias distintas dessa requisição
+        bursts.extend([copy.deepcopy(base_request) for _ in range(requests_per_burst)])
     return bursts
 
 def generate_mixed_traffic(num_hosts, n_requests, burst_probability=0.3, burst_size=5, fmin_range=(0.5, 1.0), eprs_range=(1, 10)):
