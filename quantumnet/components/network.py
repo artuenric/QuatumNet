@@ -21,8 +21,8 @@ class Network():
         self._physical = PhysicalLayer(self)
         self._link = LinkLayer(self)
         self._network = NetworkLayer(self)
-        self._transport = TransportLayer(self, self._network, self._link, self._physical)
-        self._application = ApplicationLayer(self, self._transport, self._network, self._link, self._physical)
+        self._transport = TransportLayer(self)
+        self._application = ApplicationLayer(self)
         # Sobre a execução
         self.logger = Logger.get_instance()
         self.count_qubit = 0
