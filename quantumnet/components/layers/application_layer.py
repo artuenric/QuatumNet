@@ -3,7 +3,7 @@ from quantumnet.components import Host
 from quantumnet.objects import Qubit, Logger
 
 class ApplicationLayer:
-    def __init__(self, network, transport_layer, network_layer, link_layer, physical_layer):
+    def __init__(self, network):
         """
         Inicializa a camada de aplicação do protocolo QKD (Distribuição Quântica de Chaves).
 
@@ -15,10 +15,6 @@ class ApplicationLayer:
             physical_layer: camada física da rede.
         """
         self._network = network
-        self._physical_layer = physical_layer
-        self._network_layer = network_layer
-        self._link_layer = link_layer
-        self._transport_layer = transport_layer
         self.logger = Logger.get_instance()
         self.used_qubits = 0
 
@@ -124,7 +120,7 @@ class ApplicationLayer:
             self.logger.log(f'Qubits preparados com a chave: {key} e bases: {bases_alice}')
 
             # Etapa 2: Transmissão dos qubits de Alice para Bob
-            success = self._transport_layer.run_transport_layer(alice_id, bob_id, num_qubits)
+            success = self._network.transportlayer.run_transport_layer(alice_id, bob_id, num_qubits)
             if not success:
                 self.logger.log(f'Falha na transmissão dos qubits de Alice para Bob.')
                 return None

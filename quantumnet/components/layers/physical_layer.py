@@ -4,16 +4,13 @@ from random import uniform
 import random
 
 class PhysicalLayer:
-    def __init__(self, network, physical_layer_id: int = 0):
+    def __init__(self, network):
         """
         Inicializa a camada física.
         
-        Args:
-            physical_layer_id (int): Id da camada física.
         """
         self.max_prob = 1
         self.min_prob = 0.2
-        self._physical_layer_id = physical_layer_id
         self._network = network
         self._qubits = []
         self._failed_eprs = []
@@ -34,15 +31,6 @@ class PhysicalLayer:
         """
         return f'Physical Layer {self.physical_layer_id}'
       
-    @property
-    def physical_layer_id(self):
-        """Retorna o id da camada física.
-        
-        Returns:
-            int: Id da camada física.
-        """
-        return self._physical_layer_id
-    
     @property
     def qubits(self):
         """Retorna os qubits da camada física.
@@ -79,6 +67,9 @@ class PhysicalLayer:
             Exception: Se o host especificado não existir na rede.
         """
         
+        # Obtém o host da rede
+        host = self._network.get_host(host_id)
+        
         # Incrementa o número de qubits criados na rede
         self._network.registry_of_resources['qubits created'] += 1
         
@@ -91,16 +82,9 @@ class PhysicalLayer:
         if host_id not in self._network.hosts:
             raise Exception(f'Host {host_id} não existe na rede.')
 
-        qubit_id = self._count_qubit
-        qubit = Qubit(qubit_id)
-        self._network.hosts[host_id].add_qubit(qubit)
-        
-        current_timeslot = self._network.get_timeslot()
-        self._network.register_qubit_creation(qubit_id, current_timeslot, "Physical Layer")
-
-        self._count_qubit += 1
-        self.logger.debug(f'Qubit {qubit_id} criado com fidelidade inicial {qubit.get_initial_fidelity()} e adicionado à memória do Host {host_id}.')
-        
+        qubit = Qubit(host)
+        host.add_qubit(qubit)
+                
         # Inscreve o qubit no time_slot
         time.subscribe_qubit(qubit)
 

@@ -4,20 +4,15 @@ from quantumnet.objects import Logger, Epr
 from random import uniform
 
 class TransportLayer:
-    def __init__(self, network, network_layer, link_layer, physical_layer):
+    def __init__(self, network):
         """
         Inicializa a camada de transporte.
         
         args:
             network : Network : Rede.
-            network_layer : NetworkLayer : Camada de rede.
             link_layer : LinkLayer : Camada de enlace.
-            physical_layer : PhysicalLayer : Camada física.
         """
         self._network = network
-        self._physical_layer = physical_layer
-        self._network_layer = network_layer
-        self._link_layer = link_layer
         self.logger = Logger.get_instance()
         self.transmitted_qubits = []
         self.used_eprs = 0
@@ -72,7 +67,7 @@ class TransportLayer:
             
             routes = []
             for _ in range(num_qubits):
-                route = self._network_layer.short_route_valid(alice_id, bob_id)
+                route = self._network.networklayer.short_route_valid(alice_id, bob_id)
                 if route is None:
                     self.logger.log(f'Não foi possível encontrar uma rota válida na tentativa {attempts + 1}. Timeslot: {self._network.get_timeslot()}')
                     break
@@ -125,7 +120,7 @@ class TransportLayer:
         self.logger.log(f'Timeslot {self._network.get_timeslot()}: Iniciando teletransporte entre {alice_id} e {bob_id}.')
         
         # Estabelece uma rota válida
-        route = self._network_layer.short_route_valid(alice_id, bob_id)
+        route = self._network.networklayer.short_route_valid(alice_id, bob_id)
         if route is None:
             self.logger.log(f'Não foi possível encontrar uma rota válida para teletransporte entre {alice_id} e {bob_id}. Timeslot: {self._network.get_timeslot()}')
             return False
@@ -246,7 +241,7 @@ class TransportLayer:
             for _ in range(qubits_needed):
                 self._network.timeslot()  # Incrementa o timeslot a cada criação de qubit
                 self.logger.log(f"Timeslot antes da criação do qubit: {self._network.get_timeslot()}")
-                self._physical_layer.create_qubit(alice_id)  # Cria novos qubits para Alice
+                self._network.physicallayer.create_qubit(alice_id)  # Cria novos qubits para Alice
                 self.logger.log(f"Qubit criado para Alice (Host {alice_id}) no timeslot: {self._network.get_timeslot()}")
 
             # Atualiza a quantidade de qubits disponíveis após a criação
@@ -267,7 +262,7 @@ class TransportLayer:
 
             for _ in range(num_qubits - success_count):
                 # Tenta encontrar uma rota válida
-                route = self._network_layer.short_route_valid(alice_id, bob_id)
+                route = self._network.networklayer.short_route_valid(alice_id, bob_id)
 
                 if route is None:
                     self.logger.log(f'Não foi possível encontrar uma rota válida na tentativa {attempts + 1}. Timeslot: {self._network.get_timeslot()}')
