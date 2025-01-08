@@ -33,6 +33,7 @@ class Rule(ABC):
         """Fecha a regra."""
         self.opened = False
         self.host.remove_flow_by_rule(self)
+        time.rules.remove(self)
         print(f"[{self.__repr__()}] Regra fechada e removida do Host {self.host}.")
         
     def update_time(self):

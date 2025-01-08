@@ -179,9 +179,7 @@ class PhysicalLayer:
         Returns:
             bool: True se o protocolo foi bem sucedido, False caso contrário.
         """
-        # Registra os qubits usados na rede
-        self._network.registry_of_resources['qubits used'] += 2
-
+        # Obtém os hosts da rede
         alice, bob = self._network.get_host(alice_id), self._network.get_host(bob_id)
         
         qubit1 = alice.get_last_qubit()
@@ -200,3 +198,6 @@ class PhysicalLayer:
 
             # Adiciona o EPR ao canal da rede
             self.add_epr_to_channel(epr, (alice_id, bob_id))
+            
+            # Registra os qubits usados na rede
+            self._network.registry_of_resources['qubits used'] += 2

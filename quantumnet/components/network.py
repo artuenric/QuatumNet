@@ -195,7 +195,9 @@ class Network():
             list : Lista de EPRs da aresta.
         """
         edge = (alice, bob)
-        return self._graph.edges[edge]['eprs']
+        if self._graph.edges.get(edge) != None:
+            return self._graph.edges[edge]['eprs']
+        return False
     
     def remove_epr(self, channel, epr):
         """

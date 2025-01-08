@@ -45,8 +45,11 @@ class NetworkLayer:
         returns:
             bool: True se o swapping foi bem-sucedido, False caso contrário.
         """
+        # Checa se o entrelaçamento é possível
         eprs_alice_mid = self._network.get_eprs_from_edge(alice, mid)
         eprs_mid_bob = self._network.get_eprs_from_edge(mid, bob)   
+        if (eprs_alice_mid == False) or (eprs_mid_bob is False):
+            return False
         
         # Checa se existe pares EPR entre os hosts
         if (len(eprs_alice_mid) <= 0) or (len(eprs_mid_bob) <= 0):
