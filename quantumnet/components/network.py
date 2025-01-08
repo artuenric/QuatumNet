@@ -1,5 +1,5 @@
 import networkx as nx
-from ..objects import Logger, Qubit, time
+from ..objects import logger, Qubit, time
 from ..components import Host
 from .layers import *
 import random
@@ -24,7 +24,6 @@ class Network():
         self._transport = TransportLayer(self)
         self._application = ApplicationLayer(self)
         # Sobre a execução
-        self.logger = Logger.get_instance()
         self.count_qubit = 0
         self.registry_of_resources = {'qubits created': 0,
                                       'qubits used': 0,
@@ -144,20 +143,20 @@ class Network():
         # Adiciona o host ao dicionário de hosts, se não existir
         if host.host_id not in self._hosts:        
             self._hosts[host.host_id] = host
-            Logger.get_instance().debug(f'Host {host.host_id} adicionado aos hosts da rede.')
+            logger.get_instance().debug(f'Host {host.host_id} adicionado aos hosts da rede.')
         else:
             raise Exception(f'Host {host.host_id} já existe nos hosts da rede.')
             
         # Adiciona o nó ao grafo da rede, se não existir
         if not self._graph.has_node(host.host_id):
             self._graph.add_node(host.host_id)
-            Logger.get_instance().debug(f'Nó {host.host_id} adicionado ao grafo da rede.')
+            logger.get_instance().debug(f'Nó {host.host_id} adicionado ao grafo da rede.')
             
         # Adiciona as conexões do nó ao grafo da rede, se não existirem
         for connection in host.connections:
             if not self._graph.has_edge(host.host_id, connection):
                 self._graph.add_edge(host.host_id, connection)
-                Logger.get_instance().debug(f'Conexões do {host.host_id} adicionados ao grafo da rede.')
+                logger.get_instance().debug(f'Conexões do {host.host_id} adicionados ao grafo da rede.')
     
     def get_host(self, host_id: int) -> Host:
         """
@@ -260,7 +259,7 @@ class Network():
         """
         for host_id in self._hosts:
             for i in range(num_qubits):
-                self.physicallayer.create_qubit(host_id, increment_timeslot=False,increment_qubits=False)
+                self.physicallayer.create_qubit(host_id)
 
     def supply_channels(self, num_eprs: int):
         """
@@ -273,7 +272,7 @@ class Network():
             for i in range(num_eprs):
                 epr = self.physicallayer.create_epr_pair(edge)
                 self.physicallayer.add_epr_to_channel(epr, edge)
-                self.logger.debug(f'Par EPR {epr} adicionado ao canal.')
+                logger.debug(f'Par EPR {epr} adicionado ao canal.')
 
     def start_channels(self):
         """

@@ -1,5 +1,5 @@
 from tabulate import tabulate
-from ..objects import Logger, Qubit, time
+from ..objects import logger, Qubit, time
 from math import exp
 
 class Host():
@@ -15,8 +15,6 @@ class Host():
         self._probability_replay_qubit_create = probability_replay_qubit_create
         self._flow_table = self.start_flow_table()
         self._rule_index = {}
-        # Sobre a execução
-        self.logger = Logger.get_instance()
     
     def __str__(self):
         return f'{self.host_id}'
@@ -121,7 +119,7 @@ class Host():
         
         self._count_qubit += 1
         self.memory.append(qubit)
-        Logger.get_instance().debug(f'Qubit {qubit.qubit_id} adicionado à memória do Host {self.host_id}.')
+        logger.debug(f'Qubit {qubit.qubit_id} adicionado à memória do Host {self.host_id}.')
 
     def remove_qubit(self, qubit: Qubit):
         """
@@ -132,7 +130,7 @@ class Host():
         """
         # Remove o qubit da memória.
         self.memory.remove(qubit)
-        Logger.get_instance().debug(f'Qubit {qubit.qubit_id} removido da memória do Host {self.host_id}.')
+        logger.debug(f'Qubit {qubit.qubit_id} removido da memória do Host {self.host_id}.')
     
     def info(self):
         """
