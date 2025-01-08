@@ -1,6 +1,6 @@
 import networkx as nx
 from quantumnet.components import Host
-from quantumnet.objects import Logger, Epr
+from quantumnet.objects import logger, Epr
 from random import uniform
 
 class TransportLayer:
@@ -12,8 +12,7 @@ class TransportLayer:
             network : Network : Rede.
             link_layer : LinkLayer : Camada de enlace.
         """
-        self._network = network
-        self.logger = Logger.get_instance()
+        self._network = network        
         self.transmitted_qubits = []
         self.used_eprs = 0
         self.used_qubits = 0
