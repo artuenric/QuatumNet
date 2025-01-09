@@ -57,5 +57,3 @@ def log(sim, time):
     with open(sim.filename, mode="a", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(row)
-
-    print(f"Dados do time-slot {time.get_current_time()} registrados no arquivo '{sim.filename}'.")

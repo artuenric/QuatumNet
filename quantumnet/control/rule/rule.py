@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from quantumnet.objects import time
+from quantumnet.objects import time, logger
 
 class Rule(ABC):
     def __init__(self, rule_name, ttl):
@@ -34,7 +34,7 @@ class Rule(ABC):
         self.opened = False
         self.host.remove_flow_by_rule(self)
         time.rules.remove(self)
-        print(f"[{self.__repr__()}] Regra fechada e removida do Host {self.host}.")
+        logger.info(f"[{self.__repr__()}] Regra fechada e removida do Host {self.host}.")
         
     def update_time(self):
         """Atualiza o tempo da regra."""
@@ -56,9 +56,9 @@ class Rule(ABC):
         self.hit_count += 1
         
         for time in sorted(self.actions.keys()):
-            print(f"[{self.__repr__()}] Passo: {time}")
+            logger.debug(f"[{self.__repr__()}] Passo: {time}")
             for action in self.actions[time]:
-                print(f"[{self.__repr__()}] Ação: {action}")
+                logger.debug(f"[{self.__repr__()}] Ação: {action}")
                 action.run()
     
     def set_route(self, route):
