@@ -11,7 +11,7 @@ def clear_file(file_path):
     with open(file_path, 'w', newline='') as csvfile:
         csvfile.truncate()
 
-def header(file_path):
+def header_data_network(file_path):
     """
     Adiciona o cabeçalho a um arquivo CSV.
 
@@ -34,7 +34,7 @@ def header(file_path):
             writer = csv.writer(csvfile)
             writer.writerow(header)
 
-def log(sim, time):
+def log_network(sim, filename, time):
     """
     Registra os dados de um time-slot no arquivo CSV.
 
@@ -54,6 +54,47 @@ def log(sim, time):
     ]
     
     # Adicionar a linha ao arquivo CSV
-    with open(sim.filename, mode="a", newline="") as csvfile:
+    with open(filename, mode="a", newline="") as csvfile:
         writer = csv.writer(csvfile)
         writer.writerow(row)
+
+def log_request(filename, request, num_rule):
+    """
+    Registra as informações de uma única request em um arquivo CSV.
+
+    Args:
+        filename (str): Caminho para o arquivo CSV.
+        request (Request): Objeto que contém as informações da request.
+        num_rule (int): Número de regras ativas.
+    """
+    row = [
+        request.id,
+        request.starttime,
+        request.endtime,
+        request.endtime - request.starttime,
+        num_rule
+    ]
+    # Adicionar a linha ao arquivo CSV
+    with open(filename, mode="a", newline="") as csvfile:
+        writer = csv.writer(csvfile)
+        writer.writerow(row)
+
+def header_data_requests(file_path):
+    """
+    Adiciona o cabeçalho a um arquivo CSV.
+
+    Args:
+        file_path (str): Caminho para o arquivo CSV.
+    """
+    header = [
+        "id",
+        "start_time",
+        "end_time",
+        "latency",
+        "num_rules"
+    ]
+    
+    if not os.path.exists(file_path) or os.path.getsize(file_path) == 0:
+        with open(file_path, mode="w", newline="") as csvfile:
+            writer = csv.writer(csvfile)
+            writer.writerow(header)

@@ -1,11 +1,11 @@
 from quantumnet.components import Network, Controller
 from .generate_requests import generate_traffic
-from .collect_data import clear_file, header, log
-from abc import ABC, abstractmethod
+from .collect_data import *
+import random
 from quantumnet.objects import time, logger
 
-class Sim(ABC):
-    def __init__(self, network_info, controller_info, request_info):
+class Sim():
+    def __init__(self, network_info, controller_info):
         # Rede
         self.network = Network()
         self.network.n_initial_qubits = network_info['n_initial_qubits']
@@ -18,12 +18,21 @@ class Sim(ABC):
         # Requisições
         self.requests =  None
     
-    def set_file_data(self, filename):
-        self.filename = filename
+    def set_file_data_network(self, filename):
+        default_path = 'resultados/analise_rede/'
+        self.filename = default_path + filename
         # Limpa o arquivo
         clear_file(self.filename)
         # Adiciona o cabeçalho
-        header(self.filename)
+        header_data_network(self.filename)
+    
+    def set_file_data_requests(self, filename):
+        default_path = 'resultados/analise_requests/'
+        self.filename_requests = default_path + filename
+        # Limpa o arquivo
+        clear_file(self.filename_requests)
+        # Adiciona o cabeçalho
+        header_data_requests(self.filename_requests)
     
     def set_requests(self, requests):
         self.requests = requests
@@ -38,7 +47,6 @@ class Sim(ABC):
         # Obtém o par EPR fim a fim
         eprs_e2e = self.controller.network.get_eprs_from_edge(request.alice, request.bob)
         if eprs_e2e == False or len(eprs_e2e) == 0:
-            print(f"Não foi possível obter o par EPR fim a fim para a requisição {request}")
             return False
         # Consome o par EPR
         epr = eprs_e2e[0]
@@ -54,6 +62,18 @@ class Sim(ABC):
             for bob in self.network.hosts:
                 for key in proactive_params.keys():
                     self.controller.add_match_route_rule_in_host_proactive(alice, bob, proactive_params[key]['frange'], proactive_params[key]['neprs'])
+    
+    def hibrid_initial_filling(self, proactive_params):
+        """
+        Preenhce as tabelas de forma proativa.
+        """
+        # Preenche as tabelas de forma proativa
+        for alice in self.network.hosts:
+            logger.debug(f"Adicionando regras para {alice}")
+            for bob in self.network.hosts:
+                if random.uniform(0, 1) < 0.5:
+                    for key in proactive_params.keys():
+                        self.controller.add_match_route_rule_in_host_proactive(alice, bob, proactive_params[key]['frange'], proactive_params[key]['neprs'])
         
     def proactive_process_requests(self):
         # Processa as requisições
@@ -80,6 +100,9 @@ class Sim(ABC):
                 self.controller.successful_request(request)
                 # Exibir informações da requisição
                 logger.debug(f"Request {request}: Start Time = {request.starttime}, End Time = {request.endtime}")
+            
+            # Registra a requisição
+            log_request(self.filename_requests, request, len(time.rules))
             
             # App
             self.app(request)
@@ -117,6 +140,9 @@ class Sim(ABC):
             # Registra a requisição atendida
             self.controller.successful_request(request)
             
+            # Registra a requisição
+            log_request(self.filename_requests, request, len(time.rules))
+            
             # Exibir informações da requisição
             logger.debug(f"[Time {time.get_current_time()}] Request {request}: Start Time = {request.starttime}, End Time = {request.endtime}")
 
@@ -130,7 +156,7 @@ class Sim(ABC):
         """
         # Atualiza o tempo
         for t in range(n_time_slots):
-            log(self, time)
+            log_network(self, self.filename, time)
             time.increment()
             # Atualiza os recursos de 10 em 10
             if time.get_current_time() % self.time_to_refill== 0:
