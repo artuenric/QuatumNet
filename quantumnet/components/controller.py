@@ -1,6 +1,5 @@
 import networkx as nx
-from ..components import Network, Host
-from ..control.condition import SourceIsTargetCondition, HighFidelityCondition, NormalE2ECondition
+from ..objects import logger
 from ..control.rule import DropRequestRule, BasicRuleProactive
 from ..control.table import ReactiveTable
 class Controller():
@@ -49,7 +48,7 @@ class Controller():
         for condition in self.conditions_table:
             # Retorna a ação correspondente as decisões da tabela que são válidas para a request.
             if all(d.verify(request) for d in condition):
-                print("Decisão aplicada:", condition)
+                logger.debug(f"Decisão aplicada: {condition}")
                 return self.conditions_table[condition]
 
         return [DropRequestRule]

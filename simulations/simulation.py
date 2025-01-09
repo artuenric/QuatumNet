@@ -16,7 +16,7 @@ class Sim(ABC):
         self.controller = Controller(self.network)
         self.controller.default_ttl = controller_info['default_ttl']
         # Requisições
-        self.requests = generate_traffic(request_info)
+        self.requests =  None
     
     def set_file_data(self, filename):
         self.filename = filename
@@ -24,6 +24,9 @@ class Sim(ABC):
         clear_file(self.filename)
         # Adiciona o cabeçalho
         header(self.filename)
+    
+    def set_requests(self, requests):
+        self.requests = requests
     
     def proactive_filling(self, proactive_params):
         """
@@ -35,13 +38,11 @@ class Sim(ABC):
             for bob in self.network.hosts:
                 for key in proactive_params.keys():
                     self.controller.add_match_route_rule_in_host_proactive(alice, bob, proactive_params[key]['frange'], proactive_params[key]['neprs'])
-            # Mostra as tabelas
-            self.network.get_host(alice).draw_flow_table()
         
     def proactive_process_requests(self):
         # Processa as requisições
         for request in self.requests:
-            logger.debug(f"[Time {time.get_current_time()}] Processando requisição {request}.")
+            logger.debug(f"[Time {time.get_current_time()}] Processando requisição {request}...")
             alice = self.network.get_host(request.alice)
             rule = alice.find_rule_by_request(request)
 
@@ -76,10 +77,8 @@ class Sim(ABC):
             if rule == False:  # Caso não exista um match na tabela
                 request.starttime = time.get_current_time()
                 self.update_time(3)
-                alice.draw_flow_table()
                 logger.debug(f"[Time {time.get_current_time()}] Adicionando regra no Host {alice}")
                 self.controller.add_match_route_rule_in_host_reactive(request)
-                alice.draw_flow_table()
                 rule = alice.find_rule_by_request(request)
                 
             else:  # Caso já exista a regra

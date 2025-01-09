@@ -42,7 +42,7 @@ class NetworkLayer:
             return False
         
         # Checa se existe pares EPR entre os hosts
-        if (len(eprs_alice_mid) <= 0) or (len(eprs_mid_bob) <= 0):
+        if (len(eprs_alice_mid) == 0) or (len(eprs_mid_bob) == 0):
             logger.info(f'Não há EPRs suficientes para o entanglement swapping entre {alice} e {bob}.')
             return False
         
@@ -75,3 +75,5 @@ class NetworkLayer:
         # Adiciona o par EPR virtual ao canal entre node1 e node3
         self._network.physicallayer.add_epr_to_channel(virtual_epr, (alice, bob))
         logger.debug(f'Par EPR virtual {virtual_epr} adicionado ao canal virtual ({alice}, {bob}).')
+
+        self._network.registry_of_resources['eprs used'] += 2

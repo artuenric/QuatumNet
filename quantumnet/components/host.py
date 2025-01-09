@@ -86,7 +86,7 @@ class Host():
             Qubit : Último qubit da memória.
         """
         if len(self.memory) == 0:
-            print(f'Host {self.host_id} não possui qubits na memória.')
+            logger.warn(f'Host {self.host_id} não possui qubits na memória.')
             return False
         else:    
             # Remove o último qubit da memória e do time.
