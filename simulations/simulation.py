@@ -28,6 +28,22 @@ class Sim(ABC):
     def set_requests(self, requests):
         self.requests = requests
     
+    def app(self, request):
+        """
+        Consome o par EPR fim a fim.
+
+        Args:
+            request (_type_): _description_
+        """
+        # Obtém o par EPR fim a fim
+        eprs_e2e = self.controller.network.get_eprs_from_edge(request.alice, request.bob)
+        if eprs_e2e == False or len(eprs_e2e) == 0:
+            print(f"Não foi possível obter o par EPR fim a fim para a requisição {request}")
+            return False
+        # Consome o par EPR
+        epr = eprs_e2e[0]
+        self.controller.network.physicallayer.remove_epr_from_channel(epr, epr.channel)
+        
     def proactive_filling(self, proactive_params):
         """
         Preenhce as tabelas de forma proativa.
@@ -64,7 +80,10 @@ class Sim(ABC):
                 self.controller.successful_request(request)
                 # Exibir informações da requisição
                 logger.debug(f"Request {request}: Start Time = {request.starttime}, End Time = {request.endtime}")
-                
+            
+            # App
+            self.app(request)
+            
             # Atualiza o tempo
             self.update_time(1)
     
@@ -91,6 +110,10 @@ class Sim(ABC):
             for i in range(request.neprs):
                 self.controller.run_rule(rule[1])
             request.endtime = time.get_current_time()
+            
+            # Consome o par EPR
+            self.app(request)
+            
             # Registra a requisição atendida
             self.controller.successful_request(request)
             
