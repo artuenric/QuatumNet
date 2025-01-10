@@ -84,6 +84,7 @@ class Sim():
 
             if rule == False:  # Caso não exista um match na tabela
                 logger.debug(f"[Time {time.get_current_time()}] Descartando requisição {request} no Host {alice}.")
+                # Finaliza a requisição descartada
                 request.starttime = time.get_current_time()
                 request.endtime = time.get_current_time()
                 # Registra a requisição descartada
@@ -95,7 +96,9 @@ class Sim():
                 # Executa a regra n vezes (neprs)
                 for i in range(request.neprs):
                     self.controller.run_rule(rule[1])
-                request.endtime = time.get_current_time() + 1        
+                # Finaliza a requisição atendida
+                request.endtime = time.get_current_time() + 1
+                request.completed = True     
                 # Registra a requisição atendida
                 self.controller.successful_request(request)
                 # Exibir informações da requisição
@@ -139,6 +142,7 @@ class Sim():
             
             # Registra a requisição atendida
             self.controller.successful_request(request)
+            request.completed = True
             
             # Registra a requisição
             log_request(self.filename_requests, request, len(time.rules))

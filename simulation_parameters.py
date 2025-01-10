@@ -12,10 +12,9 @@ controller_info = {
 request_info = {
     'num_hosts': 12,
     'n_requests': 100,
-    'traffic_type': 'mixed',
+    'traffic_type': 'random',
     'burst_probability': 0.3,
     'burst_size': 10,
-    'requests_per_burst': 5,
     'fmin_range': (0.5, 1.0),
     'eprs_range': (1, 10),
 }

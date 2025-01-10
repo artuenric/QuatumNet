@@ -9,6 +9,7 @@ class Request():
         self.neprs = neprs
         self.id = self.set_id()
         self.open = True
+        self.completed = False
         self.starttime = 0
         self.endtime = 0
     
@@ -17,11 +18,3 @@ class Request():
     
     def set_id(self):
         return f"R{hex(id(self))[-6:].upper()}:{self.alice}-{self.bob}:{self.fmin}:{self.neprs}"
-    
-    def close(self, endtime):
-        """
-        Fecha a requisição.
-        """
-        self.endtime = endtime
-        self.open = False
-    
